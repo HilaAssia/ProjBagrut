@@ -11,10 +11,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class SignInActivity extends AppCompatActivity {
+import com.google.firebase.auth.FirebaseUser;
+
+public class SignInActivity extends AppCompatActivity implements FBAuthHelper.FBReply {
 
     private FBAuthHelper fbAuthHelper;
-    private EditText username;
+    private EditText eMail;
     private EditText password, verPass;
     private Button signinButton;
     private TextView loginText;
@@ -25,22 +27,23 @@ public class SignInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
-        fbAuthHelper = new FBAuthHelper(this,this);
-        username = findViewById(R.id.username);
+        fbAuthHelper = new FBAuthHelper(this, this);
+        eMail = findViewById(R.id.email);
         password = findViewById(R.id.password);
         verPass = findViewById(R.id.verificationPassword);
         signinButton = findViewById(R.id.signinButton);
         signinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String email = username.getText().toString();
-                String password = password.getBytes().toString();
-                String verPass = verPass.getBytes().toString();
+                String email = eMail.getText().toString();
+                String passWord = password.getText().toString();
+                String verpass = verPass.getText().toString();
 
                 checkEmailValidity(email);
-                checkPasswordValidity(password);
+                checkPasswordValidity(passWord);
+                verifyPassword(passWord,verpass);
 
-                fbAuthHelper.creatUser(email, password);
+                fbAuthHelper.creatUser(email, passWord);
             }
         });
         loginText = findViewById(R.id.loginText);
@@ -53,4 +56,43 @@ public class SignInActivity extends AppCompatActivity {
         });
     }
 
+    private void verifyPassword(String passWord,String verpass) {
+        if (passWord.equals(verpass)) {
+            // Password is valid
+        } else {
+            // Password is invalid, show an error message
+            verPass.setError("Password not verified");
+        }
+    }
+
+    private void checkPasswordValidity(String passWord) {
+        if (passWord.length() >= 6) {
+            // Password is valid
+        } else {
+            // Password is invalid, show an error message
+            password.setError("Password must be at least 6 characters long");
+        }
+    }
+
+    private void checkEmailValidity(String email) {
+        if (android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            // Email is valid
+        } else {
+            // Email is invalid, show an error message
+            eMail.setError("Invalid email address");
+        }
+    }
+
+    @Override
+    public void creatUserSuccess(FirebaseUser user) {
+        Toast.makeText(this, "success",
+                Toast.LENGTH_SHORT).show();
+        Intent intent=new Intent(SignInActivity.this, HomeActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public void loginSuccess(FirebaseUser user) {
+
+    }
 }

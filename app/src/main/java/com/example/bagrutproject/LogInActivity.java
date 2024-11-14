@@ -12,9 +12,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class LogInActivity extends AppCompatActivity {
+import com.google.firebase.auth.FirebaseUser;
 
-    EditText username;
+public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBReply {
+
+    private FBAuthHelper fbAuthHelper;
+    EditText email;
     EditText password;
     Button loginButton;
     TextView signupText;
@@ -25,19 +28,20 @@ public class LogInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log_in);
 
-        username = findViewById(R.id.username);
+        fbAuthHelper = new FBAuthHelper(this, this);
+        email = findViewById(R.id.email);
         password = findViewById(R.id.password);
         loginButton = findViewById(R.id.loginButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (username.getText().toString().equals("user") && password.getText().toString().equals("1234")) {
-                    Toast.makeText(LogInActivity.this, "Login Successfully!", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(LogInActivity.this, HomeActivity.class);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(LogInActivity.this, "Login Failed!", Toast.LENGTH_SHORT).show();
-                }
+                String eMail = email.getText().toString();
+                String passWord = password.getText().toString();
+
+                checkEmailValidity(eMail);
+                checkPasswordValidity(passWord);
+
+                fbAuthHelper.loginUser(eMail, passWord);
             }
         });
         signupText = findViewById(R.id.signupText);
@@ -50,5 +54,35 @@ public class LogInActivity extends AppCompatActivity {
         });
     }
 
+    private void checkPasswordValidity(String passWord) {
+        if (passWord.length() >= 6) {
+            // Password is valid
+        } else {
+            // Password is invalid, show an error message
+            password.setError("Password must be at least 6 characters long");
+        }
+    }
 
+    private void checkEmailValidity(String eMail) {
+        if (android.util.Patterns.EMAIL_ADDRESS.matcher(eMail).matches()) {
+            // Email is valid
+        } else {
+            // Email is invalid, show an error message
+            email.setError("Invalid email address");
+        }
+    }
+
+    @Override
+    public void creatUserSuccess(FirebaseUser user) {
+
+    }
+
+    @Override
+    public void loginSuccess(FirebaseUser user) {
+        Toast.makeText(this, "success",
+                Toast.LENGTH_SHORT).show();
+        Intent intent=new Intent(LogInActivity.this, HomeActivity.class);
+        startActivity(intent);
+
+    }
 }

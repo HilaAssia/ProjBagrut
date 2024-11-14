@@ -10,10 +10,12 @@
     android:orientation="vertical"
     tools:context=".LogInActivity">
 
-    <ImageView
-        android:layout_width="294dp"
-        android:layout_height="221dp"
-        android:src="@raw/rgearup2" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="GearUp"
+        android:textSize="60dp"
+        android:textColor="@color/white"/>
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -37,19 +39,19 @@
                 android:layout_height="wrap_content"
                 android:text="Login"
                 android:textAlignment="center"
-                android:textColor="@color/light_blue"
+                android:textColor="#3F51B5"
                 android:textSize="36sp"
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/username"
+                android:id="@+id/email"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="40dp"
                 android:background="@drawable/custom_edittext"
                 android:drawableLeft="@drawable/baseline_person_24"
                 android:drawablePadding="8dp"
-                android:hint="Username"
+                android:hint="Email"
                 android:padding="8dp"
                 android:textColor="@color/black"
                 android:textColorHighlight="@color/cardview_dark_background" />
@@ -73,7 +75,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginTop="30dp"
-                android:backgroundTint="@color/blue"
+                android:backgroundTint="@color/light_blue"
                 android:text="Login"
                 android:textColor="@color/black"
                 android:textSize="25dp"
