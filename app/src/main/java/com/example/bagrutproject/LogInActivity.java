@@ -31,6 +31,8 @@ public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBR
         fbAuthHelper = new FBAuthHelper(this, this);
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
+
+
         loginButton = findViewById(R.id.loginButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
