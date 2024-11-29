@@ -20,18 +20,18 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        replaceFragment(new HomeFragment());
+        replaceFragment(new InventoryFragment());
 
         binding.bottomNavigationView.setOnItemReselectedListener(item -> {
             switch (item.getItemId()){
                 case R.id.homeItem:
-                    replaceFragment(new HomeFragment());
+                    replaceFragment(new ForSaleFragment());
                     break;
                 case R.id.chatItem:
-                    replaceFragment(new ChatFragment());
+                    replaceFragment(new SettingFragment());
                     break;
                 case R.id.profileItem:
-                    replaceFragment(new ProfileFragment());
+                    replaceFragment(new InventoryFragment());
                     break;
             }
         });

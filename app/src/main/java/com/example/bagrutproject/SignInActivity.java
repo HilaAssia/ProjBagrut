@@ -87,7 +87,7 @@ public class SignInActivity extends AppCompatActivity implements FBAuthHelper.FB
     public void creatUserSuccess(FirebaseUser user) {
         Toast.makeText(this, "success",
                 Toast.LENGTH_SHORT).show();
-        Intent intent=new Intent(SignInActivity.this, HomeActivity.class);
+        Intent intent=new Intent(SignInActivity.this, SetProfileActivity.class);
         startActivity(intent);
     }
 

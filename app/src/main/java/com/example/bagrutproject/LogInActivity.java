@@ -3,11 +3,11 @@ package com.example.bagrutproject;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +21,7 @@ public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBR
     EditText password;
     Button loginButton;
     TextView signupText;
+    CheckBox checkBox;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -31,7 +32,7 @@ public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBR
         fbAuthHelper = new FBAuthHelper(this, this);
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
-
+        checkBox= findViewById(R.id.checkbox_manager);
 
         loginButton = findViewById(R.id.loginButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -83,8 +84,14 @@ public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBR
     public void loginSuccess(FirebaseUser user) {
         Toast.makeText(this, "success",
                 Toast.LENGTH_SHORT).show();
-        Intent intent=new Intent(LogInActivity.this, HomeActivity.class);
-        startActivity(intent);
+        if (checkBox.isChecked()){
+            Intent intent=new Intent(LogInActivity.this, HomeActivity.class);
+            startActivity(intent);
+        }
+        else {
+            Intent intent=new Intent(LogInActivity.this, UserActivity.class);
+            startActivity(intent);
+        }
 
     }
 }
