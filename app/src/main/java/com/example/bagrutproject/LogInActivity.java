@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBReply {
@@ -28,6 +29,11 @@ public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBR
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log_in);
+
+        if(FirebaseAuth.getInstance().getCurrentUser() !=null){
+            Intent intent=new Intent(LogInActivity.this, HomeActivity.class);
+            startActivity(intent);
+        }
 
         fbAuthHelper = new FBAuthHelper(this, this);
         email = findViewById(R.id.email);

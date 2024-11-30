@@ -6,14 +6,17 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 import com.example.bagrutproject.databinding.ActivityHomeBinding;
 
 public class HomeActivity extends AppCompatActivity {
 
     ActivityHomeBinding binding;
-
+    View view;
     @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +38,7 @@ public class HomeActivity extends AppCompatActivity {
                     break;
             }
         });
+
     }
     private void replaceFragment(Fragment fragment){
         FragmentManager fragmentManager=getSupportFragmentManager();
@@ -42,4 +46,5 @@ public class HomeActivity extends AppCompatActivity {
         fragmentTransaction.replace(R.id.frameLayout,fragment);
         fragmentTransaction.commit();
     }
+
 }

@@ -1,9 +1,13 @@
 package com.example.bagrutproject;
 
+import android.widget.ImageView;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Product {
+
+    ImageView image;
     String name;
     String price;
     String category;
@@ -12,8 +16,18 @@ public class Product {
     public Product() {
         
     }
-    public Product(String name, String price) {
-        
+    public Product(String name, String price, String category, String details) {
+        this.name=name;
+        this.price=price;
+        this.category=category;
+        this.details=details;
+    }
+    public Product(ImageView image, String name, String price, String category, String details) {
+        this.image=image;
+        this.name=name;
+        this.price=price;
+        this.category=category;
+        this.details=details;
     }
 
     public String getDetails() {
@@ -38,5 +52,13 @@ public class Product {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }

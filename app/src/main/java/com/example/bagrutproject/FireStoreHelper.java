@@ -11,8 +11,9 @@ import java.util.ArrayList;
 
 public class FireStoreHelper {
     private static final String TAG = "FireStoreHelper Tag";
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private CollectionReference collectionRef;
+    private static FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private static FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+    private static CollectionReference collectionRef = db.collection("products").document(currentUser.getUid()).collection("my_products");;
     private FireStoreHelper.FBReply fbReply;
 
     public interface FBReply {
@@ -22,8 +23,6 @@ public class FireStoreHelper {
 
     public FireStoreHelper(FireStoreHelper.FBReply fbReply) {
         this.fbReply = fbReply;
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        collectionRef = db.collection("products").document(currentUser.getUid()).collection("my_products");
     }
 
     public void add(Product product) {
@@ -35,7 +34,8 @@ public class FireStoreHelper {
     }
 
     public void update(String id, Product product) {
-        collectionRef.document(id).update("name", product.getName(), "price", product.getPrice()).addOnSuccessListener(aVoid -> {
+        collectionRef.document(id).update("name", product.getName(), "price", product.getPrice(),
+                "category", product.getCategory(), "details", product.getDetails()).addOnSuccessListener(aVoid -> {
             Log.d(TAG, "DocumentSnapshot updated with ID: " + id);
         }).addOnFailureListener(e -> {
             Log.w(TAG, "Error updating document", e);
