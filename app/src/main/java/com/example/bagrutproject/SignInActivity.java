@@ -1,7 +1,5 @@
 package com.example.bagrutproject;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +8,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseUser;
 
@@ -43,7 +43,7 @@ public class SignInActivity extends AppCompatActivity implements FBAuthHelper.FB
                 checkPasswordValidity(passWord);
                 verifyPassword(passWord,verpass);
 
-                fbAuthHelper.creatUser(email, passWord);
+                fbAuthHelper.createUser(email, passWord);
             }
         });
         loginText = findViewById(R.id.loginText);
@@ -84,11 +84,9 @@ public class SignInActivity extends AppCompatActivity implements FBAuthHelper.FB
     }
 
     @Override
-    public void creatUserSuccess(FirebaseUser user) {
+    public void createUserSuccess(FirebaseUser user) {
         Toast.makeText(this, "success",
                 Toast.LENGTH_SHORT).show();
-        Intent intent=new Intent(SignInActivity.this, SetProfileActivity.class);
-        startActivity(intent);
     }
 
     @Override

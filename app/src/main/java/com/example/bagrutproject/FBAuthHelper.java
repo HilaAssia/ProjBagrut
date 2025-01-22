@@ -25,11 +25,11 @@ public class FBAuthHelper {
     }
 
     public interface FBReply{
-        public void creatUserSuccess (FirebaseUser user);
+        public void createUserSuccess (FirebaseUser user);
         public void loginSuccess (FirebaseUser user);
     }
 
-    public void creatUser(String email, String password){
+    public void createUser(String email, String password){
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -38,7 +38,7 @@ public class FBAuthHelper {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            fbReply.creatUserSuccess(user);
+                            fbReply.createUserSuccess(user);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -67,5 +67,9 @@ public class FBAuthHelper {
                         }
                     }
                 });
+    }
+
+    public void logoutUser(){
+        mAuth.getInstance().signOut();
     }
 }

@@ -8,8 +8,5 @@
     <item android:title="Products"
         android:icon="@drawable/baseline_attach_money_24"
         android:id="@+id/homeItem"/>
-    <item android:title="Setting"
-        android:icon="@drawable/baseline_settings_24"
-        android:id="@+id/chatItem"/>
 
 </menu>

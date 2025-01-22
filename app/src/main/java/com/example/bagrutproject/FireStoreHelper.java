@@ -34,8 +34,8 @@ public class FireStoreHelper {
     }
 
     public void update(String id, Product product) {
-        collectionRef.document(id).update("name", product.getName(), "price", product.getPrice(),
-                "category", product.getCategory(), "details", product.getDetails()).addOnSuccessListener(aVoid -> {
+        //"category", product.getCategory()
+        collectionRef.document(id).update("name", product.getName(), "price", product.getPrice(), "details", product.getDetails(), "isForSale", product.isForSale()).addOnSuccessListener(aVoid -> {
             Log.d(TAG, "DocumentSnapshot updated with ID: " + id);
         }).addOnFailureListener(e -> {
             Log.w(TAG, "Error updating document", e);
@@ -81,7 +81,7 @@ public class FireStoreHelper {
         });
     }
 
-    public CollectionReference getCollectionRef() {
+    public static CollectionReference getCollectionRef() {
         return collectionRef;
     }
 }

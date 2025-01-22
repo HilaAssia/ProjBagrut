@@ -7,7 +7,7 @@
     android:background="@drawable/login_background"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context=".AddProductActivity">
+    tools:context=".EditProductActivity">
 
     <ImageView
         android:id="@+id/imageView"
@@ -21,34 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
 
-        <Button
-            android:id="@+id/camera"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="camera"
-            android:textColor="@color/white"
-            android:backgroundTint="#00BCD4"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="         "/>
-
-        <Button
-            android:id="@+id/gallery"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="gallery"
-            android:backgroundTint="#00BCD4"
-            />
-    </LinearLayout>
 
     <EditText
         android:id="@+id/etName"
@@ -83,15 +56,33 @@
         android:hint="Category"
         android:inputType="text"/>
 
-    <Button
-        android:id="@+id/btnSave"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="save"
-        android:backgroundTint="@color/light_blue"
-        android:textColor="@color/black"
-        android:textStyle="bold"
-        app:cornerRadius="20dp"/>
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="save"
+            android:backgroundTint="@color/light_blue"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            app:cornerRadius="20dp"/>
+
+        <Button
+            android:id="@+id/btndelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="delete"
+            android:backgroundTint="@color/light_blue"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            app:cornerRadius="20dp"
+            android:visibility="gone"/>
+
+    </LinearLayout>
 
 </LinearLayout>

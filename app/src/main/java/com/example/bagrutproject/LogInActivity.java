@@ -1,7 +1,5 @@
 package com.example.bagrutproject;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +9,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -82,7 +82,7 @@ public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBR
     }
 
     @Override
-    public void creatUserSuccess(FirebaseUser user) {
+    public void createUserSuccess(FirebaseUser user) {
 
     }
 

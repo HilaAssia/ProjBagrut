@@ -2,31 +2,30 @@ package com.example.bagrutproject;
 
 import android.widget.ImageView;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class Product {
 
-    ImageView image;
+    //ImageView image;
     String name;
     String price;
-    String category;
+    //String category;
     String details;
+    boolean isForSale;
 
     public Product() {
         
     }
-    public Product(String name, String price, String category, String details) {
+    public Product(String name, String price, String details) {
         this.name=name;
         this.price=price;
-        this.category=category;
+        //this.category=category;
         this.details=details;
+        this.isForSale=false;
     }
     public Product(ImageView image, String name, String price, String category, String details) {
-        this.image=image;
+        //this.image=image;
         this.name=name;
         this.price=price;
-        this.category=category;
+        //this.category=category;
         this.details=details;
     }
 
@@ -54,11 +53,20 @@ public class Product {
         this.name = name;
     }
 
-    public String getCategory() {
-        return category;
+    public boolean isForSale() {
+        return isForSale;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setForSale(boolean isChecked) {
+        this.isForSale = isChecked;
     }
+
+
+    //public String getCategory() {
+        //return category;
+    //}
+
+    //public void setCategory(String category) {
+        //this.category = category;
+    //}
 }

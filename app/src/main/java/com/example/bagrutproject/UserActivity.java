@@ -1,7 +1,5 @@
 package com.example.bagrutproject;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -9,6 +7,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class UserActivity extends AppCompatActivity {
 
@@ -45,11 +45,6 @@ public class UserActivity extends AppCompatActivity {
         if(id==R.id.action_logout)
         {
             //TODO logout
-        }
-        else if(R.id.action_setProfile==id)
-        {
-            Intent intent=new Intent(UserActivity.this, SetProfileActivity.class);
-            startActivity(intent);
         }
         return true;
     }
