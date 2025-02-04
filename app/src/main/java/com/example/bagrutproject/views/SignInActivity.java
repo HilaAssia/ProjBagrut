@@ -1,16 +1,19 @@
-package com.example.bagrutproject;
+package com.example.bagrutproject.views;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.bagrutproject.utils.FBAuthHelper;
+import com.example.bagrutproject.R;
 import com.google.firebase.auth.FirebaseUser;
 
 public class SignInActivity extends AppCompatActivity implements FBAuthHelper.FBReply {
@@ -20,6 +23,7 @@ public class SignInActivity extends AppCompatActivity implements FBAuthHelper.FB
     private EditText password, verPass;
     private Button signinButton;
     private TextView loginText;
+    CheckBox checkBox;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -87,10 +91,23 @@ public class SignInActivity extends AppCompatActivity implements FBAuthHelper.FB
     public void createUserSuccess(FirebaseUser user) {
         Toast.makeText(this, "success",
                 Toast.LENGTH_SHORT).show();
+        if (checkBox.isChecked()){
+            Intent intent=new Intent(SignInActivity.this, HomeActivity.class);
+            startActivity(intent);
+        }
+        else {
+            Intent intent=new Intent(SignInActivity.this, UserActivity.class);
+            startActivity(intent);
+        }
     }
 
     @Override
     public void loginSuccess(FirebaseUser user) {
+
+    }
+
+    @Override
+    public void logoutSuccess(FirebaseUser user) {
 
     }
 }

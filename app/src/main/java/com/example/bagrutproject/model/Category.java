@@ -1,4 +1,4 @@
-package com.example.bagrutproject;
+package com.example.bagrutproject.model;
 
 public class Category {
     private String name;

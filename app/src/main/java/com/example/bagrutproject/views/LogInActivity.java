@@ -1,4 +1,4 @@
-package com.example.bagrutproject;
+package com.example.bagrutproject.views;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -12,6 +12,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.bagrutproject.utils.FBAuthHelper;
+import com.example.bagrutproject.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -31,7 +33,7 @@ public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBR
         setContentView(R.layout.activity_log_in);
 
         if(FirebaseAuth.getInstance().getCurrentUser() !=null){
-            Intent intent=new Intent(LogInActivity.this, HomeActivity.class);
+            Intent intent=new Intent(LogInActivity.this, UserActivity.class);
             startActivity(intent);
         }
 
@@ -98,6 +100,11 @@ public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBR
             Intent intent=new Intent(LogInActivity.this, UserActivity.class);
             startActivity(intent);
         }
+
+    }
+
+    @Override
+    public void logoutSuccess(FirebaseUser user) {
 
     }
 }

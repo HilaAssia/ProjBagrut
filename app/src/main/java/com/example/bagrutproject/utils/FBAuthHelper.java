@@ -1,4 +1,4 @@
-package com.example.bagrutproject;
+package com.example.bagrutproject.utils;
 
 import android.app.Activity;
 import android.util.Log;
@@ -27,6 +27,7 @@ public class FBAuthHelper {
     public interface FBReply{
         public void createUserSuccess (FirebaseUser user);
         public void loginSuccess (FirebaseUser user);
+        public void logoutSuccess (FirebaseUser user);
     }
 
     public void createUser(String email, String password){
@@ -70,6 +71,8 @@ public class FBAuthHelper {
     }
 
     public void logoutUser(){
+        FirebaseUser user = mAuth.getCurrentUser();
         mAuth.getInstance().signOut();
+        fbReply.logoutSuccess(user);
     }
 }

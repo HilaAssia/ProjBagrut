@@ -1,20 +1,22 @@
-package com.example.bagrutproject;
+package com.example.bagrutproject.views;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.bagrutproject.utils.FBAuthHelper;
+import com.example.bagrutproject.R;
 import com.example.bagrutproject.databinding.ActivityHomeBinding;
+import com.google.firebase.auth.FirebaseUser;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements FBAuthHelper.FBReply {
 
     private FBAuthHelper fbAuthHelper;
     ActivityHomeBinding binding;
@@ -29,16 +31,21 @@ public class HomeActivity extends AppCompatActivity {
 
         binding.bottomNavigationView.setOnItemReselectedListener(item -> {
             switch (item.getItemId()){
-                case R.id.homeItem:
+                case R.id.productsItem:
                     replaceFragment(new ForSaleFragment());
                     break;
-                case R.id.profileItem:
+                case R.id.InventoryItem:
                     replaceFragment(new InventoryFragment());
+                    break;
+                case R.id.LogoutItem:
+                    fbAuthHelper.logoutUser();
+                    Intent intent = new Intent(HomeActivity.this, LogInActivity.class);
+                    startActivity(intent);
                     break;
             }
         });
 
-
+        fbAuthHelper=new FBAuthHelper(this,this);
     }
     private void replaceFragment(Fragment fragment){
         FragmentManager fragmentManager=getSupportFragmentManager();
@@ -48,26 +55,18 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_nav_menu, menu);
-        return  true;
+    public void createUserSuccess(FirebaseUser user) {
+
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.action_logout:
-                logout();
-            case R.id.go_back:
-                replaceFragment(new InventoryFragment());
-        }
+    public void loginSuccess(FirebaseUser user) {
 
-        return super.onOptionsItemSelected(item);
     }
 
-    private void logout(){
-        fbAuthHelper.logoutUser();
+    @Override
+    public void logoutSuccess(FirebaseUser user) {
+        Toast.makeText(this, "success",
+                Toast.LENGTH_SHORT).show();
     }
 }

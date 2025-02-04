@@ -12,7 +12,7 @@
         android:src="@drawable/baseline_person_24" />
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="148dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
@@ -22,9 +22,9 @@
             android:id="@+id/tvPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1,000,000"
-            android:textStyle="bold"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:text="price"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvName"
@@ -41,10 +41,50 @@
             android:textAppearance="?android:attr/textAppearanceSmall" />
     </LinearLayout>
 
-    <CheckBox android:id="@+id/checkbox_forSale"
-        android:layout_gravity="center_vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="sell" />
+    <LinearLayout
+        android:layout_width="5dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <!-- TextView המציג את הכמות -->
+        <TextView
+            android:id="@+id/tvQuantity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:text="quantity"
+            android:textColor="@color/black"
+            android:textSize="12dp" />
+
+        <LinearLayout
+            android:layout_width="42dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical">
+
+            <!-- כפתור הוספה -->
+            <ImageButton
+                android:id="@+id/btnIncrease"
+                android:layout_width="12dp"
+                android:layout_height="6dp"
+                android:src="@drawable/baseline_keyboard_arrow_up_24"
+                android:layout_marginBottom="2dp"
+                />
+
+            <!-- כפתור הפחתה -->
+            <ImageButton
+                android:id="@+id/btnDecrease"
+                android:layout_width="12dp"
+                android:layout_height="6dp"
+                android:src="@drawable/baseline_keyboard_arrow_down_24"
+                android:textSize="2sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

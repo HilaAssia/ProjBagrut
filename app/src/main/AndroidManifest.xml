@@ -16,34 +16,25 @@
         android:theme="@style/Theme.BagrutProject"
         tools:targetApi="31">
         <activity
-            android:name=".InventoryActivity"
+            android:name=".views.ProductDetailsActivity"
             android:exported="false" />
         <activity
-            android:name=".EditProductActivity"
+            android:name=".views.EditProductActivity"
             android:exported="false" />
         <activity
-            android:name=".EditNote"
+            android:name=".views.CartActivity"
             android:exported="false" />
         <activity
-            android:name=".Notes"
+            android:name=".views.UserActivity"
             android:exported="false" />
         <activity
-            android:name=".SetProfileActivity"
+            android:name=".views.HomeActivity"
             android:exported="false" />
         <activity
-            android:name=".CartActivity"
+            android:name=".views.SignInActivity"
             android:exported="false" />
         <activity
-            android:name=".UserActivity"
-            android:exported="false" />
-        <activity
-            android:name=".HomeActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SignInActivity"
-            android:exported="false" />
-        <activity
-            android:name=".LogInActivity"
+            android:name=".views.LogInActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

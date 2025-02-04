@@ -7,7 +7,7 @@
     android:background="@drawable/login_background"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context=".EditProductActivity">
+    tools:context=".views.EditProductActivity">
 
     <ImageView
         android:id="@+id/imageView"
@@ -17,11 +17,38 @@
         android:src="@mipmap/profile_icon_round"
         app:cornerRadius = "20dp"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="10dp">
 
+        <!-- כפתור לבחירת תמונה מהגלריה -->
+        <Button
+            android:id="@+id/btnSelectImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gallery"
+            android:backgroundTint="@color/light_blue"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            app:cornerRadius="20dp"
+            android:layout_marginEnd="15dp"/>
 
+        <!-- כפתור לצילום תמונה -->
+        <Button
+            android:id="@+id/btnCaptureImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Camera"
+            android:backgroundTint="@color/light_blue"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            app:cornerRadius="20dp"
+            android:layout_marginStart="15dp"/>
+
+    </LinearLayout>
 
     <EditText
         android:id="@+id/etName"
@@ -35,7 +62,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Price"
-        android:inputType="text"/>
+        android:inputType="number"/>
 
 
     <EditText
@@ -48,13 +75,29 @@
         android:background="@color/white"
         android:inputType="textMultiLine"/>
 
-
-    <EditText
-        android:id="@+id/etCategory"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Category"
-        android:inputType="text"/>
+        android:orientation="horizontal">
+
+        <!-- שדה לבחירת כמות -->
+        <EditText
+            android:id="@+id/etQuantity"
+            android:layout_width="310dp"
+            android:layout_height="wrap_content"
+            android:hint="Quantity"
+            android:inputType="number" />
+
+        <!-- שדה לבחירה אם המוצר למכירה או לא -->
+        <Switch
+            android:id="@+id/switchForSale"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="For Sale"
+            android:checked="true"
+            android:layout_gravity=""/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
