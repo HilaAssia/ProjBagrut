@@ -131,7 +131,7 @@ public class SignInActivity extends AppCompatActivity implements FBAuthHelper.FB
                 @Override
                 public void onClick(View v) {
                     if(isManager(etManagerPass.getText().toString())){
-                        Manager manager =new Manager(user.getEmail(),user);
+                        Manager manager =new Manager(user.getEmail(),user.getUid());
                         fireStoreHelper.add(manager);
                         Intent intent=new Intent(SignInActivity.this, HomeActivity.class);
                         startActivity(intent);

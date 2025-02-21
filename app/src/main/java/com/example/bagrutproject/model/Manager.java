@@ -1,7 +1,6 @@
 package com.example.bagrutproject.model;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 public class Manager {
     String eMail;
@@ -9,9 +8,9 @@ public class Manager {
 
     public Manager(){}
 
-    public Manager(String eMail, FirebaseUser user){
+    public Manager(String eMail, String uID){
         this.eMail=eMail;
-        this.uID=user.getUid();
+        this.uID=uID;
     }
 
     public String geteMail() {
@@ -22,7 +21,7 @@ public class Manager {
         this.eMail = eMail;
     }
 
-    public void setUID(FirebaseAuth mAuth){ this.uID=mAuth.getUid(); }
+    public void setuID(FirebaseAuth mAuth){ this.uID=mAuth.getUid(); }
 
     public String getuID() { return uID; }
 }

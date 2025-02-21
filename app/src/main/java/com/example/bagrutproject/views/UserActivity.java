@@ -36,6 +36,7 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
 
+        searchBar=findViewById(R.id.search_bar);
         sp=getSharedPreferences("user cart",0);
         fbAuthHelper=new FBAuthHelper(this, this);
 
@@ -60,7 +61,7 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
         rvProducts= findViewById(R.id.urvProducts);
         setupRecyclerView();
 
-        //search();
+        search(searchBar);
     }
 
     private void setupRecyclerView(){
@@ -114,8 +115,8 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
         editor.commit();
     }
 
-    public void search(){
-        searchBar=findViewById(R.id.search_bar);
+    public void search(SearchView searchBar){
+        //searchBar=findViewById(R.id.search_bar);
         // הגדרת מאזין לשינוי הטקסט בשדה החיפוש
         searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override

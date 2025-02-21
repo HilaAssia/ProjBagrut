@@ -5,15 +5,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.bagrutproject.utils.FBAuthHelper;
 import com.example.bagrutproject.R;
+import com.example.bagrutproject.utils.FBAuthHelper;
 import com.example.bagrutproject.utils.FireStoreHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,11 +21,11 @@ public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBR
 
     private FBAuthHelper fbAuthHelper;
     private FireStoreHelper fireStoreHelper;
+    private FirebaseUser user;
     EditText email;
     EditText password;
     Button loginButton;
     TextView signupText;
-    CheckBox checkBox;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -34,16 +33,25 @@ public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBR
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log_in);
 
-        if(FirebaseAuth.getInstance().getCurrentUser() !=null){
-            Intent intent=new Intent(LogInActivity.this, UserActivity.class);
-            startActivity(intent);
+        user=FirebaseAuth.getInstance().getCurrentUser();
+
+        if(user!=null){
+            if (fireStoreHelper.getCollectionRefManager().whereEqualTo("uID",user.getUid())!=null){
+                Intent intent=new Intent(LogInActivity.this, HomeActivity.class);
+                startActivity(intent);
+                finish();
+            }
+            else {
+                Intent intent=new Intent(LogInActivity.this, UserActivity.class);
+                startActivity(intent);
+                finish();
+            }
         }
 
         fbAuthHelper = new FBAuthHelper(this, this);
         fireStoreHelper = new FireStoreHelper(null);
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
-        checkBox= findViewById(R.id.checkbox_manager);
 
         loginButton = findViewById(R.id.loginButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
