@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="categories">
+        <item>surfboard</item>
+        <item>wetsuit</item>
+        <item>swimsuit</item>
+        <item>leash</item>
+        <item>grip</item>
+        <item>wax</item>
+        <item>fins</item>
+        <item>sunscreen</item>
+    </string-array>
+</resources>

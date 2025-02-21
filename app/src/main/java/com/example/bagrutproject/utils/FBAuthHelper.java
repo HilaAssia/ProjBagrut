@@ -13,7 +13,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class FBAuthHelper {
-    private FirebaseAuth mAuth;
+    private static FirebaseAuth mAuth;
     private FBReply fbReply;
     private Activity activity;
     private static final String TAG="myTAG";
@@ -23,6 +23,7 @@ public class FBAuthHelper {
         this.activity = activity;
         this.fbReply = fbReply;
     }
+    public static FirebaseUser getCurrentUser(){return mAuth.getCurrentUser();}
 
     public interface FBReply{
         public void createUserSuccess (FirebaseUser user);

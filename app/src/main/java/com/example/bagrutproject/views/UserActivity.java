@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +28,7 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
     ImageButton cart, logout;
     RecyclerView rvProducts;
     ProductsAdapter productsAdapter;
+    SearchView searchBar;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -55,8 +57,10 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
                 startActivity(intent);
             }
         });
-        rvProducts= findViewById(R.id.rvProducts);
+        rvProducts= findViewById(R.id.urvProducts);
         setupRecyclerView();
+
+        //search();
     }
 
     private void setupRecyclerView(){
@@ -106,7 +110,28 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
     public void addToCart(Product product){
         sp=getSharedPreferences("user cart",0);
         SharedPreferences.Editor editor=sp.edit();
-        editor.putString("product", product.toString(product.getImage(), product.getName(), product.getPrice(), product.getDetails(), product.getQuantity(), product.getForSale()));
+        editor.putString("product", product.toString());
         editor.commit();
+    }
+
+    public void search(){
+        searchBar=findViewById(R.id.search_bar);
+        // הגדרת מאזין לשינוי הטקסט בשדה החיפוש
+        searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // פעולה כאשר המשתמש שולח את החיפוש
+                Toast.makeText(UserActivity.this, "חיפשת: " + query, Toast.LENGTH_SHORT).show();
+                return false; // לא נדרשת פעולה נוספת אחרי שליחת החיפוש
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                // פעולה כאשר הטקסט בשדה החיפוש משתנה
+                // אפשר לבצע חיפוש בזמן אמת
+                Toast.makeText(UserActivity.this, "שינויים בחיפוש: " + newText, Toast.LENGTH_SHORT).show();
+                return false; // מאפשר להמשיך לחפש
+            }
+        });
     }
 }

@@ -14,12 +14,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.bagrutproject.utils.FBAuthHelper;
 import com.example.bagrutproject.R;
+import com.example.bagrutproject.utils.FireStoreHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBReply {
 
     private FBAuthHelper fbAuthHelper;
+    private FireStoreHelper fireStoreHelper;
     EditText email;
     EditText password;
     Button loginButton;
@@ -38,6 +40,7 @@ public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBR
         }
 
         fbAuthHelper = new FBAuthHelper(this, this);
+        fireStoreHelper = new FireStoreHelper(null);
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
         checkBox= findViewById(R.id.checkbox_manager);
@@ -92,13 +95,15 @@ public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBR
     public void loginSuccess(FirebaseUser user) {
         Toast.makeText(this, "success",
                 Toast.LENGTH_SHORT).show();
-        if (checkBox.isChecked()){
+        if (fireStoreHelper.getCollectionRefManager().whereEqualTo("uID",user.getUid())!=null){
             Intent intent=new Intent(LogInActivity.this, HomeActivity.class);
             startActivity(intent);
+            finish();
         }
         else {
             Intent intent=new Intent(LogInActivity.this, UserActivity.class);
             startActivity(intent);
+            finish();
         }
 
     }

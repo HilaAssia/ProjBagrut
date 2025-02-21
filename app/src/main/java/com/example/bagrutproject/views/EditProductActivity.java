@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Switch;
 
 import androidx.activity.result.ActivityResultCallback;
@@ -24,6 +25,7 @@ public class EditProductActivity extends AppCompatActivity {
 
     private ActivityResultLauncher<Void> mGetThumb;
     private ActivityResultLauncher<String> mGetContent;
+    Spinner spinner;
     FireStoreHelper fireStoreHelper;
     ImageView ivImage;
     Switch forSale;
@@ -37,6 +39,13 @@ public class EditProductActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_product);
 
+        spinner = findViewById(R.id.spinner);
+// Create an ArrayAdapter using the string array and a default spinner layout.
+        //ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.xml.category,android.R.layout.simple_spinner_item);
+// Specify the layout to use when the list of choices appears.
+        //adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+// Apply the adapter to the spinner.
+        //spinner.setAdapter(adapter);
         ivImage=findViewById(R.id.imageView);
         etName=findViewById(R.id.etName);
         etPrice=findViewById(R.id.etPrice);
@@ -66,7 +75,12 @@ public class EditProductActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(validateInput()==true) {
-                    saveProduct(ImageUtils.getBitmapFromImageView(ivImage), etName.getText().toString(), etPrice.getText().toString(), etDetails.getText().toString(), etQuantity.getInputType(), forSale.isChecked());// etCategory.getText().toString());
+                    saveProduct(ImageUtils.getBitmapFromImageView(ivImage),
+                            etName.getText().toString(),
+                            etPrice.getText().toString(),
+                            etDetails.getText().toString(),
+                            Integer.parseInt(etQuantity.getText().toString()),
+                            forSale.isChecked());// etCategory.getText().toString());
                     Intent intent=new Intent(EditProductActivity.this, HomeActivity.class);
                     startActivity(intent);
                 }
@@ -110,7 +124,7 @@ public class EditProductActivity extends AppCompatActivity {
             etDetails.setError("please enter some content");
             isValid = false;
         }
-        if (etQuantity.getInputType()<=0){
+        if (Integer.parseInt(etQuantity.getText().toString())<=0){
             etQuantity.setError("please enter some content");
             isValid = false;
         }
@@ -125,8 +139,9 @@ public class EditProductActivity extends AppCompatActivity {
         Product product=new Product(ImageUtils.convertBitmapToString(bitmap),name,price,details,quantity,forSale);
         if (isEditMode)
             fireStoreHelper.update(docId,product);
-        else
+        else {
             fireStoreHelper.add(product);
+        }
     }
 
     private void deleteProduct(){

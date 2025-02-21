@@ -1,28 +1,33 @@
 package com.example.bagrutproject.views;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.bagrutproject.model.Category;
 import com.example.bagrutproject.utils.FireStoreHelper;
 import com.example.bagrutproject.R;
 import com.example.bagrutproject.model.Product;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.Query;
 
+import java.util.ArrayList;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link InventoryFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class InventoryFragment extends Fragment {
+public class InventoryFragment extends Fragment implements FireStoreHelper.FBReply {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -35,6 +40,7 @@ public class InventoryFragment extends Fragment {
 
     ProductsAdapter productsAdapter;
     RecyclerView rvProducts;
+    FireStoreHelper fireStoreHelper;
 
     public InventoryFragment() {
         // Required empty public constructor
@@ -74,12 +80,34 @@ public class InventoryFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_inventory, container, false);
         rvProducts= (RecyclerView) view.findViewById(R.id.rvProducts);
+        fireStoreHelper= new FireStoreHelper(this);
+        Dialog dialog = new Dialog(InventoryFragment.this.getContext());
         Button add = (Button) view.findViewById(R.id.btnAdd);
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent( InventoryFragment.this.getContext(), EditProductActivity.class);
                 startActivity(intent);
+            }
+        });
+        Button newCat = (Button) view.findViewById(R.id.newCategory);
+        newCat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.setContentView(R.layout.dialog);
+                dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                dialog.setCancelable(false);
+                EditText etCategory=dialog.findViewById(R.id.etCategory);
+                Button buttonAdd=dialog.findViewById(R.id.btnAdd);
+                buttonAdd.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Category cat=new Category(etCategory.getText().toString());
+                        fireStoreHelper.add(cat);
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
             }
         });
 
@@ -114,6 +142,16 @@ public class InventoryFragment extends Fragment {
     public void onResume() {
         super.onResume();
         productsAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void getAllSuccess(ArrayList<Product> products) {
+
+    }
+
+    @Override
+    public void getOneSuccess(Product product) {
+
     }
 
 }

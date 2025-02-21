@@ -2,6 +2,8 @@ package com.example.bagrutproject.utils;
 
 import android.util.Log;
 
+import com.example.bagrutproject.model.Category;
+import com.example.bagrutproject.model.Manager;
 import com.example.bagrutproject.model.Product;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -15,6 +17,8 @@ public class FireStoreHelper {
     private static FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
     private static CollectionReference collectionRef = db.collection("products");
+    private static CollectionReference collectionRefCat = db.collection("categories");
+    private static CollectionReference collectionRefManager = db.collection("managers");
     private FireStoreHelper.FBReply fbReply;
 
     public interface FBReply {
@@ -26,17 +30,38 @@ public class FireStoreHelper {
         this.fbReply = fbReply;
     }
 
-    public void add(Product product) {
-        collectionRef.add(product).addOnSuccessListener(documentReference -> {
+    public void add(Manager manager) {
+        collectionRefManager.document(FBAuthHelper.getCurrentUser().getUid()).set(manager).addOnSuccessListener(documentReference -> {
+            Log.d(TAG, "DocumentSnapshot added with ID: " + FBAuthHelper.getCurrentUser().getUid());
+        }).addOnFailureListener(e -> {
+            Log.w(TAG, "Error adding document", e);
+        });
+    }
+
+    public void add(Category category) {
+        collectionRefCat.add(category).addOnSuccessListener(documentReference -> {
             Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
         }).addOnFailureListener(e -> {
             Log.w(TAG, "Error adding document", e);
         });
     }
 
+    public void add(Product product) {
+        collectionRef.add(product).addOnSuccessListener(documentReference -> {
+            Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+        }).addOnFailureListener(e -> {
+            Log.w(TAG, "Error adding document", e);
+        });
+
+    }
+
     public void update(String id, Product product) {
         //"category", product.getCategory()
-        collectionRef.document(id).update("image", product.getImage(),"name", product.getName(), "price", product.getPrice(), "details", product.getDetails(), "quantity", product.getQuantity(), "forSale", product.getForSale()).addOnSuccessListener(aVoid -> {
+        collectionRef.document(id).update("image", product.getImage(),
+                "name", product.getName(), "price",
+                product.getPrice(), "details", product.getDetails(),
+                "quantity", product.getQuantity(), "forSale",
+                product.getForSale(), "id", id).addOnSuccessListener(aVoid -> {
             Log.d(TAG, "DocumentSnapshot updated with ID: " + id);
         }).addOnFailureListener(e -> {
             Log.w(TAG, "Error updating document", e);
@@ -84,5 +109,8 @@ public class FireStoreHelper {
 
     public static CollectionReference getCollectionRef() {
         return collectionRef;
+    }
+    public static CollectionReference getCollectionRefManager() {
+        return collectionRefManager;
     }
 }

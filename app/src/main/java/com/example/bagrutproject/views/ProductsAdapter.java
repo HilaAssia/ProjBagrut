@@ -2,7 +2,6 @@ package com.example.bagrutproject.views;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +22,6 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
 
     private Context context;
     boolean isUser;
-    SharedPreferences sp;
 
     public ProductsAdapter(FirestoreRecyclerOptions<Product> options, Context context, boolean isUser) {
         super(options);
@@ -56,6 +54,7 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
                 intent.putExtra("details", product.getDetails());
                 intent.putExtra("quantity", product.getQuantity());
                 intent.putExtra("forSale", product.getForSale());
+                intent.putExtra("id",product.getId());
 
                 String docId=this.getSnapshots().getSnapshot(position).getId();
                 intent.putExtra("docId", docId);
@@ -70,6 +69,7 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
                 intent.putExtra("name", product.getName());
                 intent.putExtra("price", product.getPrice());
                 intent.putExtra("details", product.getDetails());
+                intent.putExtra("id",product.getId());
 
                 String docId=this.getSnapshots().getSnapshot(position).getId();
                 intent.putExtra("docId", docId);

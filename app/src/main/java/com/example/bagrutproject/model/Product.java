@@ -1,5 +1,7 @@
 package com.example.bagrutproject.model;
 
+import java.util.UUID;
+
 public class Product {
 
     String image;
@@ -7,6 +9,7 @@ public class Product {
     String price;
     //String category;
     String details;
+    String id;
     int quantity;
     boolean forSale;
 
@@ -20,6 +23,8 @@ public class Product {
         this.details=details;
         this.quantity=quantity;
         this.forSale=forSale;
+        UUID randomUUID = UUID.randomUUID();
+        this.id=randomUUID.toString();
     }
     public Product(String image, String name, String price, String details, int quantity, boolean forSale) {//, String category כדי להוסיף קטגוריה
         this.image=image;
@@ -29,6 +34,8 @@ public class Product {
         this.details=details;
         this.quantity=quantity;
         this.forSale=forSale;
+        UUID randomUUID = UUID.randomUUID();
+        this.id=randomUUID.toString();
     }
 
     public String getImage() { return image;}
@@ -89,7 +96,15 @@ public class Product {
     //public void setCategory(String category) {
         //this.category = category;
     //}
-    public String toString(String image, String name, String price, String details, int quantity, boolean forSale){
-        return image+","+name+","+price+","+details+","+quantity+","+forSale;
+    public String toString(){
+        return image+","+name+","+price+","+details+","+quantity+","+forSale+","+id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 }
