@@ -1,17 +1,21 @@
 package com.example.bagrutproject.views;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -19,6 +23,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.bagrutproject.R;
+import com.example.bagrutproject.model.Category;
 import com.example.bagrutproject.model.Product;
 import com.example.bagrutproject.utils.FireStoreHelper;
 import com.example.bagrutproject.utils.ImageUtils;
@@ -37,7 +42,7 @@ public class EditProductActivity extends AppCompatActivity {
     EditText etName, etPrice, etDetails, etQuantity;
     Boolean isEditMode=false;
     Button saveBtn,deleteBtn,captureImageBtn,selectImageBtn;
-    String docId;
+    String docId, category;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +50,20 @@ public class EditProductActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_product);
 
         spinner = findViewById(R.id.spinner);
-        getCategory();
+        setCategories();
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                String selectedItem = parentView.getItemAtPosition(position).toString();
+                Toast.makeText(EditProductActivity.this, "בחרת: " + selectedItem, Toast.LENGTH_SHORT).show();
+                category=selectedItem;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // אם לא נבחר שום דבר
+            }
+        });
         ivImage=findViewById(R.id.imageView);
         etName=findViewById(R.id.etName);
         etPrice=findViewById(R.id.etPrice);
@@ -80,7 +98,7 @@ public class EditProductActivity extends AppCompatActivity {
                             etPrice.getText().toString(),
                             etDetails.getText().toString(),
                             Integer.parseInt(etQuantity.getText().toString()),
-                            forSale.isChecked());// etCategory.getText().toString());
+                            forSale.isChecked(), category.toString());
                     Intent intent=new Intent(EditProductActivity.this, HomeActivity.class);
                     startActivity(intent);
                 }
@@ -100,12 +118,14 @@ public class EditProductActivity extends AppCompatActivity {
         docId = getIntent().getStringExtra("docId");
         if (docId != null && !docId.isEmpty()){
             isEditMode=true;
+            ivImage.setImageBitmap(ImageUtils.convertStringToBitmap(getIntent().getStringExtra("image")));
             forSale.setChecked(getIntent().getBooleanExtra("forSale", false));
             etName.setText(getIntent().getStringExtra("name"));
             etPrice.setText(getIntent().getStringExtra("price"));
             etDetails.setText(getIntent().getStringExtra("details"));
             etQuantity.setText(Integer.toString(getIntent().getIntExtra("quantity",0)));
-            //etCategory.setText(getIntent().getStringExtra("category"));
+            category=(getIntent().getStringExtra("category"));
+            //spinner.getAdapter().getItem(category);
             findViewById(R.id.btndelete).setVisibility(View.VISIBLE);
         }
     }
@@ -128,15 +148,39 @@ public class EditProductActivity extends AppCompatActivity {
             etQuantity.setError("please enter some content");
             isValid = false;
         }
-        //if (etCategory.getText().toString().isEmpty()){
-            //etCategory.setError("please enter some content");
-            //isValid = false;
-        //}
+        if (category=="category"){
+            //להכין דיאלוג ששואל אם המנהל רוצה ליצור קטגוריה חדשה
+            Dialog dialog = new Dialog(EditProductActivity.this);
+            dialog.setContentView(R.layout.dialog);
+            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            dialog.setCancelable(false);
+            EditText etCategory=dialog.findViewById(R.id.etCategory);
+            Button buttonAdd=dialog.findViewById(R.id.btnAdd);
+            buttonAdd.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Category cat=new Category(etCategory.getText().toString());
+                    fireStoreHelper.add(cat);
+                    setCategories();
+                    dialog.dismiss();
+                }
+            });
+            Button buttonCancel=dialog.findViewById(R.id.btnCancel);
+            buttonCancel.setVisibility(View.VISIBLE);
+            buttonCancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+                }
+            });
+            dialog.show();
+            isValid=false;
+        }
         return isValid;
     }
 
-    private void saveProduct(Bitmap bitmap, String name, String price, String details, int quantity, boolean forSale){
-        Product product=new Product(ImageUtils.convertBitmapToString(bitmap),name,price,details,quantity,forSale);
+    private void saveProduct(Bitmap bitmap, String name, String price, String details, int quantity, boolean forSale, String category){
+        Product product=new Product(ImageUtils.convertBitmapToString(bitmap),name,price,details,quantity,forSale,category);
         if (isEditMode)
             fireStoreHelper.update(docId,product);
         else {
@@ -174,7 +218,7 @@ public class EditProductActivity extends AppCompatActivity {
         spinner.setAdapter(adapter);
     }
 
-    public void getCategory(){
+    public void setCategories(){
         // יצירת רשימה של מיתרים שתכיל את שמות הקטגוריות
         ArrayList<String> categoriesList = new ArrayList<>();
         categoriesList.add("category");

@@ -56,12 +56,11 @@ public class FireStoreHelper {
     }
 
     public void update(String id, Product product) {
-        //"category", product.getCategory()
         collectionRef.document(id).update("image", product.getImage(),
                 "name", product.getName(), "price",
                 product.getPrice(), "details", product.getDetails(),
                 "quantity", product.getQuantity(), "forSale",
-                product.getForSale(), "id", id).addOnSuccessListener(aVoid -> {
+                product.getForSale(),"category", product.getCategory(), "id", id).addOnSuccessListener(aVoid -> {
             Log.d(TAG, "DocumentSnapshot updated with ID: " + id);
         }).addOnFailureListener(e -> {
             Log.w(TAG, "Error updating document", e);

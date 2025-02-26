@@ -40,6 +40,7 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
         holder.tvPrice.setText(product.getPrice());
         holder.tvDetails.setText(product.getDetails());
         holder.tvQuantity.setText(Integer.toString(product.getQuantity()));
+        holder.tvCategory.setText(product.getCategory());
 
         if(!isUser){
             holder.ibIncrease.setOnClickListener(v -> {
@@ -56,6 +57,7 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
                 intent.putExtra("details", product.getDetails());
                 intent.putExtra("quantity", product.getQuantity());
                 intent.putExtra("forSale", product.getForSale());
+                intent.putExtra("category", product.getCategory());
                 intent.putExtra("id",product.getId());
 
                 String docId=this.getSnapshots().getSnapshot(position).getId();
@@ -71,6 +73,7 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
                 intent.putExtra("name", product.getName());
                 intent.putExtra("price", product.getPrice());
                 intent.putExtra("details", product.getDetails());
+                intent.putExtra("category", product.getCategory());
                 intent.putExtra("id",product.getId());
 
                 String docId=this.getSnapshots().getSnapshot(position).getId();
@@ -89,7 +92,7 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
 
 
     public class ProductViewHolder extends RecyclerView.ViewHolder {
-        TextView tvName, tvPrice, tvDetails, tvQuantity;
+        TextView tvName, tvPrice, tvDetails, tvQuantity, tvCategory;
         ImageView ivImage;
         ImageButton ibIncrease, ibDecrease;
 
@@ -101,6 +104,7 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
             tvPrice=itemView.findViewById(R.id.tvPrice);
             tvDetails=itemView.findViewById(R.id.tvDetails);
             tvQuantity=itemView.findViewById(R.id.tvQuantity);
+            tvCategory=itemView.findViewById(R.id.tvCategory);
 
             ibIncrease=itemView.findViewById(R.id.btnIncrease);
             ibDecrease=itemView.findViewById(R.id.btnDecrease);

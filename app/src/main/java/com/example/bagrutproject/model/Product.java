@@ -7,7 +7,7 @@ public class Product {
     String image;
     String name;
     String price;
-    //String category;
+    String category;
     String details;
     String id;
     int quantity;
@@ -26,11 +26,11 @@ public class Product {
         UUID randomUUID = UUID.randomUUID();
         this.id=randomUUID.toString();
     }
-    public Product(String image, String name, String price, String details, int quantity, boolean forSale) {//, String category כדי להוסיף קטגוריה
+    public Product(String image, String name, String price, String details, int quantity, boolean forSale, String category) {// כדי להוסיף קטגוריה
         this.image=image;
         this.name=name;
         this.price=price;
-        //this.category=category;
+        this.category=category;
         this.details=details;
         this.quantity=quantity;
         this.forSale=forSale;
@@ -89,15 +89,15 @@ public class Product {
     }
 
 
-    //public String getCategory() {
-        //return category;
-    //}
+    public String getCategory() {
+        return category;
+    }
 
-    //public void setCategory(String category) {
-        //this.category = category;
-    //}
+    public void setCategory(String category) {
+        this.category = category;
+    }
     public String toString(){
-        return image+","+name+","+price+","+details+","+quantity+","+forSale+","+id;
+        return image+","+name+","+price+","+details+","+quantity+","+forSale+","+category+","+id;
     }
 
     public void setId(String id) {
