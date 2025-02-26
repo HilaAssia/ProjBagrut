@@ -71,19 +71,22 @@ public class CartActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        cartAdapter.startListening();
+        if (cartAdapter!=null)
+            cartAdapter.startListening();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        cartAdapter.stopListening();
+        if (cartAdapter!=null)
+            cartAdapter.stopListening();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        cartAdapter.notifyDataSetChanged();
+        if (cartAdapter!=null)
+            cartAdapter.notifyDataSetChanged();
     }
 
     public List<String> getCartItems(){

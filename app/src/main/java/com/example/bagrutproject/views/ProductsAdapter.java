@@ -22,6 +22,7 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
 
     private Context context;
     boolean isUser;
+    Product product;
 
     public ProductsAdapter(FirestoreRecyclerOptions<Product> options, Context context, boolean isUser) {
         super(options);
@@ -32,6 +33,7 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
 
     @Override
     protected void onBindViewHolder(@NonNull ProductViewHolder holder, int position, @NonNull Product product) {
+        this.product=product;
         if (product.getImage()!=null)
             holder.ivImage.setImageBitmap(ImageUtils.convertStringToBitmap(product.getImage()));
         holder.tvName.setText(product.getName());

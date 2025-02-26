@@ -23,8 +23,11 @@ import com.google.firebase.firestore.Query;
 
 public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBReply {
 
+    private String previousQuery = ""; // שומר את החיפוש הקודם
+    private Runnable searchRunnable;
     SharedPreferences sp;
     private FBAuthHelper fbAuthHelper;
+    private FireStoreHelper fireStoreHelper;
     ImageButton cart, logout;
     RecyclerView rvProducts;
     ProductsAdapter productsAdapter;
@@ -39,6 +42,7 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
         searchBar=findViewById(R.id.search_bar);
         sp=getSharedPreferences("user cart",0);
         fbAuthHelper=new FBAuthHelper(this, this);
+        fireStoreHelper=new FireStoreHelper(null);
 
         cart = findViewById(R.id.cartButton);
         cart.setOnClickListener(new View.OnClickListener() {
@@ -59,19 +63,24 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
             }
         });
         rvProducts= findViewById(R.id.urvProducts);
-        setupRecyclerView();
+        setupRecyclerView(false);
 
-        search(searchBar);
+        search();
     }
 
-    private void setupRecyclerView(){
+    private void setupRecyclerView(boolean isSearching){
         Query query = FireStoreHelper.getCollectionRef().whereEqualTo("forSale",true).orderBy("name",
                 Query.Direction.DESCENDING);
         FirestoreRecyclerOptions<Product> options=new FirestoreRecyclerOptions.Builder<Product>()
                 .setQuery(query, Product.class).build();
-        rvProducts.setLayoutManager(new LinearLayoutManager(this));
-        productsAdapter = new ProductsAdapter(options,this,true);
-        rvProducts.setAdapter(productsAdapter);
+        if (!isSearching) {
+            rvProducts.setLayoutManager(new LinearLayoutManager(this));
+            productsAdapter = new ProductsAdapter(options, this, true);
+            rvProducts.setAdapter(productsAdapter);
+        }
+        else
+            // עדכון ה-adapter עם אפשרויות חדשות
+            productsAdapter.updateOptions(options);
     }
 
     @Override
@@ -83,7 +92,7 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
     @Override
     public void onStop() {
         super.onStop();
-        productsAdapter.stopListening();
+        productsAdapter.stopListening();// עצור את ההאזנה
     }
 
     @Override
@@ -108,31 +117,79 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
                 Toast.LENGTH_SHORT).show();
     }
 
-    public void addToCart(Product product){
-        sp=getSharedPreferences("user cart",0);
-        SharedPreferences.Editor editor=sp.edit();
-        editor.putString("product", product.toString());
-        editor.commit();
-    }
-
-    public void search(SearchView searchBar){
-        //searchBar=findViewById(R.id.search_bar);
+    public void search(){
         // הגדרת מאזין לשינוי הטקסט בשדה החיפוש
         searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                // פעולה כאשר המשתמש שולח את החיפוש
-                Toast.makeText(UserActivity.this, "חיפשת: " + query, Toast.LENGTH_SHORT).show();
-                return false; // לא נדרשת פעולה נוספת אחרי שליחת החיפוש
+                // הגדרת ריצה חדשה שתתבצע לאחר DEBOUNCE_DELAY
+                searchRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!query.equals(previousQuery)) {
+                            previousQuery = query;
+                            performSearch(query);
+                        }
+                    }
+                };
+
+                // סינון ברגע שהמשתמש מקיש Enter
+                performSearch(query);
+                Toast.makeText(UserActivity.this,"חיפשת: "+query,Toast.LENGTH_SHORT).show();
+                return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                // פעולה כאשר הטקסט בשדה החיפוש משתנה
-                // אפשר לבצע חיפוש בזמן אמת
-                Toast.makeText(UserActivity.this, "שינויים בחיפוש: " + newText, Toast.LENGTH_SHORT).show();
-                return false; // מאפשר להמשיך לחפש
+
+                if (newText.isEmpty())
+                    // סינון בזמן שהמשתמש מקליד
+                    performSearch(newText);
+                else {
+                    // הגדרת ריצה חדשה שתתבצע לאחר DEBOUNCE_DELAY
+                    searchRunnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!newText.equals(previousQuery)) {
+                                previousQuery = newText;
+                                performSearch(newText);
+                            }
+                        }
+                    };
+
+                    // סינון ברגע שהמשתמש מקיש Enter
+                    performSearch(newText);
+                }
+
+                Toast.makeText(UserActivity.this,"שינית את החיפוש ל: "+newText,Toast.LENGTH_SHORT).show();
+                return false;
             }
         });
+    }
+
+    // פונקציה שתבצע את החיפוש ב-Firestore
+    private void performSearch(String query) {
+        // אם אין חיפוש, הראה את כל המוצרים
+        if (query.isEmpty()) {
+            setupRecyclerView(true);
+        }
+
+        else {
+            // יצירת שאילתה מ-Firestore שמסננת את המוצרים לפי שם המוצר
+            Query searchQuery = FireStoreHelper.getCollectionRef().whereEqualTo("forSale", true)
+                    .whereGreaterThanOrEqualTo("name", query)
+                    .whereLessThanOrEqualTo("name", query + "\uf8ff"); // חיפוש מותאם
+
+            // עדכון ה-FirestoreRecyclerOptions עם השאילתה המפולטרת
+            FirestoreRecyclerOptions<Product> newOptions = new FirestoreRecyclerOptions.Builder<Product>()
+                    .setQuery(searchQuery, Product.class)
+                    .build();
+
+            // עדכון ה-adapter עם אפשרויות חדשות
+            productsAdapter.updateOptions(newOptions);
+        }
+
+        // עדכן את המידע שהאדפטר מאזין לו
+        productsAdapter.notifyDataSetChanged();
     }
 }

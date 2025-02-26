@@ -3,6 +3,7 @@ package com.example.bagrutproject.views;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +17,7 @@ import com.example.bagrutproject.utils.FBAuthHelper;
 import com.example.bagrutproject.utils.FireStoreHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBReply {
 
@@ -36,16 +38,34 @@ public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBR
         user=FirebaseAuth.getInstance().getCurrentUser();
 
         if(user!=null){
-            if (fireStoreHelper.getCollectionRefManager().whereEqualTo("uID",user.getUid())!=null){
-                Intent intent=new Intent(LogInActivity.this, HomeActivity.class);
-                startActivity(intent);
-                finish();
-            }
-            else {
-                Intent intent=new Intent(LogInActivity.this, UserActivity.class);
-                startActivity(intent);
-                finish();
-            }
+            fireStoreHelper.getCollectionRefManager()
+                    .whereEqualTo("uID",user.getUid()).get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            QuerySnapshot querySnapshot = task.getResult();
+
+                            if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                                // אם יש מסמך עם ה-`uID` של המשתמש
+                                // אפשר להמשיך עם פעולה כלשהי
+                                Intent intent=new Intent(LogInActivity.this, HomeActivity.class);
+                                startActivity(intent);
+                                finish();
+                                Log.d("Firestore", "מסמך נמצא עבור המשתמש");
+                            } else {
+                                // אם לא נמצא מסמך עם ה-`uID` של המשתמש
+                                // בצע פעולה אחרת (למשל יצירת מסמך חדש)
+                                Log.d("Firestore", "לא נמצא מסמך עם ה-uID של המשתמש");
+
+                                Intent intent=new Intent(LogInActivity.this, UserActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }
+                        } else {
+                            // טיפול בשגיאה (אם לא מצליח לשלוף את הנתונים)
+                            Exception e = task.getException();
+                            Log.e("Firestore", "שגיאה בקריאת המסמכים: ", e);
+                        }
+                    });
         }
 
         fbAuthHelper = new FBAuthHelper(this, this);
@@ -103,17 +123,35 @@ public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBR
     public void loginSuccess(FirebaseUser user) {
         Toast.makeText(this, "success",
                 Toast.LENGTH_SHORT).show();
-        if (fireStoreHelper.getCollectionRefManager().whereEqualTo("uID",user.getUid())!=null){
-            Intent intent=new Intent(LogInActivity.this, HomeActivity.class);
-            startActivity(intent);
-            finish();
-        }
-        else {
-            Intent intent=new Intent(LogInActivity.this, UserActivity.class);
-            startActivity(intent);
-            finish();
-        }
 
+        fireStoreHelper.getCollectionRefManager()
+                .whereEqualTo("uID",user.getUid()).get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        QuerySnapshot querySnapshot = task.getResult();
+
+                        if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                            // אם יש מסמך עם ה-`uID` של המשתמש
+                            // אפשר להמשיך עם פעולה כלשהי
+                            Intent intent=new Intent(LogInActivity.this, HomeActivity.class);
+                            startActivity(intent);
+                            finish();
+                            Log.d("Firestore", "מסמך נמצא עבור המשתמש");
+                        } else {
+                            // אם לא נמצא מסמך עם ה-`uID` של המשתמש
+                            // בצע פעולה אחרת (למשל יצירת מסמך חדש)
+                            Log.d("Firestore", "לא נמצא מסמך עם ה-uID של המשתמש");
+
+                            Intent intent=new Intent(LogInActivity.this, UserActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    } else {
+                        // טיפול בשגיאה (אם לא מצליח לשלוף את הנתונים)
+                        Exception e = task.getException();
+                        Log.e("Firestore", "שגיאה בקריאת המסמכים: ", e);
+                    }
+                });
     }
 
     @Override
