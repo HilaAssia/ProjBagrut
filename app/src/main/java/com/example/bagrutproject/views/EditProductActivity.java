@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -20,6 +22,9 @@ import com.example.bagrutproject.R;
 import com.example.bagrutproject.model.Product;
 import com.example.bagrutproject.utils.FireStoreHelper;
 import com.example.bagrutproject.utils.ImageUtils;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
 
 public class EditProductActivity extends AppCompatActivity {
 
@@ -40,12 +45,7 @@ public class EditProductActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_product);
 
         spinner = findViewById(R.id.spinner);
-// Create an ArrayAdapter using the string array and a default spinner layout.
-        //ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.xml.category,android.R.layout.simple_spinner_item);
-// Specify the layout to use when the list of choices appears.
-        //adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Apply the adapter to the spinner.
-        //spinner.setAdapter(adapter);
+        getCategory();
         ivImage=findViewById(R.id.imageView);
         etName=findViewById(R.id.etName);
         etPrice=findViewById(R.id.etPrice);
@@ -166,5 +166,36 @@ public class EditProductActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
+    }
+
+    public void updateSpinner(ArrayList<String> items){
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, items);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // מגדיר את התצוגה של רשימת האפשרויות
+        spinner.setAdapter(adapter);
+    }
+
+    public void getCategory(){
+        // יצירת רשימה של מיתרים שתכיל את שמות הקטגוריות
+        ArrayList<String> categoriesList = new ArrayList<>();
+        categoriesList.add("category");
+
+        // שליפת הקטגוריות מ-Firestore
+        fireStoreHelper.getCollectionRefCat().get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            // הוספת שם הקטגוריה לרשימה
+                            String categoryName = document.getString("category");
+                            categoriesList.add(categoryName);
+                        }
+                        // אחרי שסיימנו לעדכן את הרשימה, תוכל להמיר אותה למערך (אם נדרש)
+                        //String[] categoriesArray = categoriesList.toArray(new String[0]);
+                        // עכשיו categoriesArray מכיל את כל הקטגוריות
+                        // אפשר לעדכן את ה-Spinner או כל רכיב אחר
+                        updateSpinner(categoriesList);
+                    } else {
+                        Log.w("Firestore", "Error getting documents.", task.getException());
+                    }
+                });
     }
 }

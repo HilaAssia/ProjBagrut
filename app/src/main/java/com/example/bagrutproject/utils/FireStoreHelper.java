@@ -113,4 +113,7 @@ public class FireStoreHelper {
     public static CollectionReference getCollectionRefManager() {
         return collectionRefManager;
     }
+    public static CollectionReference getCollectionRefCat() {
+        return collectionRefCat;
+    }
 }
