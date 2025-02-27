@@ -69,7 +69,7 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
     }
 
     private void setupRecyclerView(boolean isSearching){
-        Query query = FireStoreHelper.getCollectionRef().whereEqualTo("forSale",true).orderBy("name",
+        Query query = FireStoreHelper.getCollectionRefProduct().whereEqualTo("forSale",true).orderBy("name",
                 Query.Direction.DESCENDING);
         FirestoreRecyclerOptions<Product> options=new FirestoreRecyclerOptions.Builder<Product>()
                 .setQuery(query, Product.class).build();
@@ -176,7 +176,7 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
 
         else {
             // יצירת שאילתה מ-Firestore שמסננת את המוצרים לפי שם המוצר
-            Query searchQuery = FireStoreHelper.getCollectionRef().whereEqualTo("forSale", true)
+            Query searchQuery = FireStoreHelper.getCollectionRefProduct().whereEqualTo("forSale", true)
                     .whereGreaterThanOrEqualTo("name", query)
                     .whereLessThanOrEqualTo("name", query + "\uf8ff"); // חיפוש מותאם
 

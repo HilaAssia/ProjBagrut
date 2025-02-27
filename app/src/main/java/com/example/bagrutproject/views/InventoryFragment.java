@@ -117,7 +117,7 @@ public class InventoryFragment extends Fragment implements FireStoreHelper.FBRep
     }
 
     private void setupRecyclerView(){
-        Query query = FireStoreHelper.getCollectionRef().orderBy("name",
+        Query query = FireStoreHelper.getCollectionRefProduct().orderBy("name",
                 Query.Direction.DESCENDING);
         FirestoreRecyclerOptions<Product> options=new FirestoreRecyclerOptions.Builder<Product>()
                 .setQuery(query, Product.class).build();
@@ -152,6 +152,11 @@ public class InventoryFragment extends Fragment implements FireStoreHelper.FBRep
     @Override
     public void getOneSuccess(Product product) {
 
+    }
+
+    @Override
+    public Product[] onProductsLoaded(Product[] products) {
+        return products;
     }
 
 }

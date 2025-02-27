@@ -79,7 +79,7 @@ public class ForSaleFragment extends Fragment {
     }
 
     private void setupRecyclerView(){
-        Query query = FireStoreHelper.getCollectionRef().whereEqualTo("forSale", true).orderBy("name",
+        Query query = FireStoreHelper.getCollectionRefProduct().whereEqualTo("forSale", true).orderBy("name",
                 Query.Direction.DESCENDING);//מבצע סינון ומחזיר רק את המסמכים שבהם השדה "forSale" הוא true ומסדר אותם לפי השם
         FirestoreRecyclerOptions<Product> options=new FirestoreRecyclerOptions.Builder<Product>()
                 .setQuery(query, Product.class).build();

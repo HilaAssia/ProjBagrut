@@ -1,9 +1,12 @@
 package com.example.bagrutproject.utils;
 
+import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.bagrutproject.model.Category;
 import com.example.bagrutproject.model.Manager;
+import com.example.bagrutproject.model.Order;
 import com.example.bagrutproject.model.Product;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -16,18 +19,29 @@ public class FireStoreHelper {
     private static final String TAG = "FireStoreHelper Tag";
     private static FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-    private static CollectionReference collectionRef = db.collection("products");
+    private static CollectionReference collectionRefProduct = db.collection("products");
     private static CollectionReference collectionRefCat = db.collection("categories");
     private static CollectionReference collectionRefManager = db.collection("managers");
+    private static CollectionReference collectionRefOrder = db.collection("orders");
     private FireStoreHelper.FBReply fbReply;
 
     public interface FBReply {
         void getAllSuccess(ArrayList<Product> products);
         void getOneSuccess(Product product);
+        Product[] onProductsLoaded(Product[] products);
     }
 
     public FireStoreHelper(FireStoreHelper.FBReply fbReply) {
         this.fbReply = fbReply;
+    }
+
+    public void add(Order order, Context context) {
+        collectionRefOrder.add(order).addOnSuccessListener(documentReference -> {
+            Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+            Toast.makeText(context, "your order was sent", Toast.LENGTH_SHORT).show();
+        }).addOnFailureListener(e -> {
+            Log.w(TAG, "Error adding document", e);
+        });
     }
 
     public void add(Manager manager) {
@@ -47,7 +61,7 @@ public class FireStoreHelper {
     }
 
     public void add(Product product) {
-        collectionRef.add(product).addOnSuccessListener(documentReference -> {
+        collectionRefProduct.add(product).addOnSuccessListener(documentReference -> {
             Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
         }).addOnFailureListener(e -> {
             Log.w(TAG, "Error adding document", e);
@@ -56,7 +70,7 @@ public class FireStoreHelper {
     }
 
     public void update(String id, Product product) {
-        collectionRef.document(id).update("image", product.getImage(),
+        collectionRefProduct.document(id).update("image", product.getImage(),
                 "name", product.getName(), "price",
                 product.getPrice(), "details", product.getDetails(),
                 "quantity", product.getQuantity(), "forSale",
@@ -67,14 +81,14 @@ public class FireStoreHelper {
         });
     }
     public void delete(String id) {
-        collectionRef.document(id).delete().addOnSuccessListener(aVoid -> {
+        collectionRefProduct.document(id).delete().addOnSuccessListener(aVoid -> {
             Log.d(TAG, "DocumentSnapshot deleted with ID: " + id);
         }).addOnFailureListener(e -> {
             Log.w(TAG, "Error deleting document", e);
         });
     }
     public void getAll() {
-        collectionRef.get().addOnCompleteListener(task -> {
+        collectionRefProduct.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 ArrayList<Product> products = new ArrayList<>();
                 for (com.google.firebase.firestore.DocumentSnapshot document : task.getResult()) {
@@ -90,7 +104,7 @@ public class FireStoreHelper {
 
     }
     public void getOne(String id) {
-        collectionRef.document(id).get().addOnCompleteListener(task -> {
+        collectionRefProduct.document(id).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 com.google.firebase.firestore.DocumentSnapshot document = task.getResult();
                 if (document.exists()) {
@@ -106,8 +120,8 @@ public class FireStoreHelper {
         });
     }
 
-    public static CollectionReference getCollectionRef() {
-        return collectionRef;
+    public static CollectionReference getCollectionRefProduct() {
+        return collectionRefProduct;
     }
     public static CollectionReference getCollectionRefManager() {
         return collectionRefManager;
@@ -115,4 +129,5 @@ public class FireStoreHelper {
     public static CollectionReference getCollectionRefCat() {
         return collectionRefCat;
     }
+    public static CollectionReference getCollectionRefOrder(){return collectionRefOrder;}
 }

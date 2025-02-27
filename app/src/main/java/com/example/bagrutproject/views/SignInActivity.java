@@ -179,4 +179,9 @@ public class SignInActivity extends AppCompatActivity implements FBAuthHelper.FB
     public void getOneSuccess(Product product) {
 
     }
+
+    @Override
+    public Product[] onProductsLoaded(Product[] products) {
+        return products;
+    }
 }
