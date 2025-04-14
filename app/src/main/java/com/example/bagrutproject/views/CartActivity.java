@@ -1,10 +1,13 @@
 package com.example.bagrutproject.views;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,8 +33,12 @@ public class CartActivity extends AppCompatActivity implements FireStoreHelper.F
     SharedPreferences sp;
     CartAdapter cartAdapter;
     RecyclerView rvProducts;
+    TextView tvTotalPrice;
     Button buyBtn;
+    ArrayList<Product> order;
+    double totalPrice;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,24 +46,28 @@ public class CartActivity extends AppCompatActivity implements FireStoreHelper.F
 
         fireStoreHelper=new FireStoreHelper(this);
         rvProducts=findViewById(R.id.crvProducts);
+        tvTotalPrice=findViewById(R.id.tvTotalPrice);
+        order=new ArrayList<>();
+        getOrder(getCartItems(),CartActivity.this);
         buyBtn=findViewById(R.id.button);
         buyBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Product[] products=getOrder(getCartItems(),CartActivity.this);
-                Order order=new Order(products);
+                Order order=new Order(CartActivity.this.order,fireStoreHelper.getCurrentUser().getUid(),String.valueOf(totalPrice),fireStoreHelper.getCurrentUser().getEmail());
                 fireStoreHelper.add(order,CartActivity.this);
+                updateProductQuantity(order.getProducts(),1);
+                Toast.makeText(CartActivity.this, "you will get an email when your order is ready :)", Toast.LENGTH_SHORT).show();
             }
         });
 
         setupRecyclerView(getCartItems());
     }
 
-    private void setupRecyclerView(List<String> Ids){
-        if (Ids!=null && !Ids.isEmpty()){
+    private void setupRecyclerView(List<String> ids){
+        if (ids!=null && !ids.isEmpty()){
             // עכשיו נבצע את השאילתה עבור המוצרים עם ה-IDs האלו
             Query query = FireStoreHelper.getCollectionRefProduct()
-                    .whereIn("id", Ids)  // מחפש רק את המוצרים עם מזהים ברשימה
+                    .whereIn("id", ids)  // מחפש רק את המוצרים עם מזהים ברשימה
                     .orderBy("name", Query.Direction.DESCENDING);  // ניתן להוסיף סידור אם צריך
 
             FirestoreRecyclerOptions<Product> options = new FirestoreRecyclerOptions.Builder<Product>()
@@ -71,6 +82,14 @@ public class CartActivity extends AppCompatActivity implements FireStoreHelper.F
             // במקרה שאין מוצרים ברשימה או שהיא ריקה, תוכל להציג הודעה או לפעול אחרת
             Log.d("CartActivity", "No products to display.");
         }
+    }
+
+    public void setTotalPrice(ArrayList<Product> products){
+        totalPrice=0;
+        for (Product product:products){
+            totalPrice+=Integer.parseInt(product.getPrice());
+        }
+        tvTotalPrice.setText(tvTotalPrice.getText()+String.valueOf(totalPrice));
     }
 
     @Override
@@ -95,7 +114,7 @@ public class CartActivity extends AppCompatActivity implements FireStoreHelper.F
     }
 
     public List<String> getCartItems(){
-        sp = getSharedPreferences("cart", 0);
+        sp = getSharedPreferences(fireStoreHelper.getCurrentUser().getUid(), 0);
         String json = sp.getString("productList", ""); // מקבל את ה-JSON
         Gson gson = new Gson();
 
@@ -106,27 +125,27 @@ public class CartActivity extends AppCompatActivity implements FireStoreHelper.F
         return Ids;
     }
 
-    public Product[] getOrder(List<String> ids, FireStoreHelper.FBReply listener){
+    public void getOrder(List<String> ids, FireStoreHelper.FBReply listener){
+        ArrayList<Product> o=new ArrayList<>();
         // בדיקה אם הרשימה ריקה
         if (ids == null || ids.isEmpty()) {
-            listener.onProductsLoaded(new Product[0]); // מחזיר מערך ריק אם אין IDs
+            listener.onProductsLoaded(o); // מחזיר מערך ריק אם אין IDs
+            return;
         }
-
-        fireStoreHelper.getCollectionRefOrder().whereIn("id", ids) // מחפש את כל המוצרים עם ה-IDs ברשימה
+        fireStoreHelper.getCollectionRefProduct().whereIn("id", ids) // מחפש את כל המוצרים עם ה-IDs ברשימה
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
-                        List<Product> products = new ArrayList<>();
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             Product product = document.toObject(Product.class); // המרה למסד הנתונים
-                            products.add(product);
+                            o.add(product);
                         }
-                        listener.onProductsLoaded(products.toArray(new Product[0]));
-                    } else {
-                        listener.onProductsLoaded(new Product[0]); // במקרה של שגיאה מחזירים מערך ריק
                     }
+                    listener.onProductsLoaded(o); // במקרה של שגיאה מחזירים מערך ריק
                 });
-        return new Product[0];
+
+        Toast.makeText(this, this.order.size()+" מוצרים בעגלה", Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
@@ -140,7 +159,22 @@ public class CartActivity extends AppCompatActivity implements FireStoreHelper.F
     }
 
     @Override
-    public Product[] onProductsLoaded(Product[] products) {
-        return products;
+    public void onProductsLoaded(ArrayList<Product> products) {
+        order=products;
+        setTotalPrice(order);
+        Toast.makeText(this, products.size()+"products loaded", Toast.LENGTH_SHORT).show();
     }
+
+    public void updateProductQuantity(ArrayList<Product> order, int purchasedQuantity) {
+        for (Product p:order){
+            if (p.getQuantity()-purchasedQuantity<=0)
+                Toast.makeText(this, "this product is out of stock!!!", Toast.LENGTH_LONG).show();
+            else {
+                p.setQuantity(p.getQuantity()-purchasedQuantity);
+                fireStoreHelper.update(p.getId(),p);
+                Toast.makeText(this, p.getQuantity()+" items are in stock", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
 }

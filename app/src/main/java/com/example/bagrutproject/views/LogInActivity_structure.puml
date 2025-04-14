@@ -1,0 +1,461 @@
+@startuml
+
+/' diagram meta data start
+config=StructureConfiguration;
+{
+  "projectClassification": {
+    "searchMode": "OpenProject", // OpenProject, AllProjects
+    "includedProjects": "",
+    "pathEndKeywords": "*.impl",
+    "isClientPath": "",
+    "isClientName": "",
+    "isTestPath": "",
+    "isTestName": "",
+    "isMappingPath": "",
+    "isMappingName": "",
+    "isDataAccessPath": "",
+    "isDataAccessName": "",
+    "isDataStructurePath": "",
+    "isDataStructureName": "",
+    "isInterfaceStructuresPath": "",
+    "isInterfaceStructuresName": "",
+    "isEntryPointPath": "",
+    "isEntryPointName": "",
+    "treatFinalFieldsAsMandatory": false
+  },
+  "graphRestriction": {
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "com.example.bagrutproject.*",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "removeByInheritance": "", // inheritance/annotation based filtering is done in a second step
+    "removeByAnnotation": "",
+    "removeByClassPackage": "", // cleanup the graph after inheritance/annotation based filtering is done
+    "removeByClassName": "",
+    "cutMappings": false,
+    "cutEnum": true,
+    "cutTests": true,
+    "cutClient": true,
+    "cutDataAccess": true,
+    "cutInterfaceStructures": true,
+    "cutDataStructures": true,
+    "cutGetterAndSetter": true,
+    "cutConstructors": true
+  },
+  "graphTraversal": {
+    "forwardDepth": 3,
+    "backwardDepth": 3,
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "hideMappings": false,
+    "hideDataStructures": false,
+    "hidePrivateMethods": true,
+    "hideInterfaceCalls": true, // indirection: implementation -> interface (is hidden) -> implementation
+    "onlyShowApplicationEntryPoints": false, // root node is included
+    "useMethodCallsForStructureDiagram": "ForwardOnly" // ForwardOnly, BothDirections, No
+  },
+  "details": {
+    "aggregation": "GroupByClass", // ByClass, GroupByClass, None
+    "showClassGenericTypes": true,
+    "showMethods": true,
+    "showMethodParameterNames": true,
+    "showMethodParameterTypes": true,
+    "showMethodReturnType": true,
+    "showPackageLevels": 2,
+    "showDetailedClassStructure": true
+  },
+  "rootClass": "com.example.bagrutproject.views.LogInActivity",
+  "extensionCallbackMethod": "" // qualified.class.name#methodName - signature: public static String method(String)
+}
+diagram meta data end '/
+
+
+
+digraph g {
+    rankdir="TB"
+    splines=polyline
+    
+
+'nodes 
+subgraph cluster_1322970774 { 
+   	label=example
+	labeljust=l
+	fillcolor="#ececec"
+	style=filled
+   
+   subgraph cluster_1429690348 { 
+   	label=bagrutproject
+	labeljust=l
+	fillcolor="#d8d8d8"
+	style=filled
+   
+   AdminPasswordChecker461170758[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AdminPasswordChecker</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ generatePasswordForToday(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ validatePassword(inputPassword: String): boolean</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+CartActivity453036289[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)CartActivity</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >#   buyBtn: Button [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   cartAdapter: CartAdapter [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   fireStoreHelper: FireStoreHelper [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   order: ArrayList&lt;Product&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   rvProducts: RecyclerView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   sp: SharedPreferences [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   totalPrice: double [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   tvTotalPrice: TextView [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ getAllSuccess(products: ArrayList&lt;Product&gt;)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ getOneSuccess(product: Product)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ getOrder(ids: List&lt;String&gt;, listener: FBReply)</TD></TR>
+<TR><TD ALIGN="LEFT" ># onCreate(savedInstanceState: Bundle)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onProductsLoaded(products: ArrayList&lt;Product&gt;)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onResume()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onStart()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onStop()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ updateProductQuantity(order: ArrayList&lt;Product&gt;, purchasedQuantity: int)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+EditProductActivity453036289[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)EditProductActivity</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >#   captureImageBtn: Button [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   category: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   deleteBtn: Button [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   docId: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   etDetails: EditText [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   etName: EditText [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   etPrice: EditText [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   etQuantity: EditText [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   fireStoreHelper: FireStoreHelper [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   forSale: Switch [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   isEditMode: Boolean [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   ivImage: ImageView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   mGetContent: ActivityResultLauncher&lt;String&gt; [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   mGetThumb: ActivityResultLauncher&lt;Void&gt; [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   saveBtn: Button [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   selectImageBtn: Button [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   spinner: Spinner [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >- deleteProduct()</TD></TR>
+<TR><TD ALIGN="LEFT" ># onCreate(savedInstanceState: Bundle)</TD></TR>
+<TR><TD ALIGN="LEFT" >- registerCameraLauncher()</TD></TR>
+<TR><TD ALIGN="LEFT" >- registerForContentLauncher()</TD></TR>
+<TR><TD ALIGN="LEFT" >- saveProduct(bitmap: Bitmap, name: String, price: String, details: String, quantity: int, forSale: boolean, category: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ updateSpinner(items: ArrayList&lt;String&gt;)</TD></TR>
+<TR><TD ALIGN="LEFT" >- validateInput(): boolean</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+FBAuthHelper453628606[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)FBAuthHelper</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   activity: Activity [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   fbReply: FBReply [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ createUser(email: String, password: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ loginUser(email: String, password: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ logoutUser()</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+FireStoreHelper453628606[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)FireStoreHelper</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   fbReply: FBReply [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ add(order: Order, context: Context)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ add(manager: Manager)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ add(category: Category)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ add(product: Product)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ delete(id: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ getAll()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ getOne(id: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ update(id: String, product: Product)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+HomeActivity453036289[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)HomeActivity</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >#   binding: ActivityHomeBinding [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   fbAuthHelper: FBAuthHelper [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ createUserSuccess(user: FirebaseUser)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ loginSuccess(user: FirebaseUser)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ logoutSuccess(user: FirebaseUser)</TD></TR>
+<TR><TD ALIGN="LEFT" ># onCreate(savedInstanceState: Bundle)</TD></TR>
+<TR><TD ALIGN="LEFT" >- replaceFragment(fragment: Fragment)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+InventoryFragment453036289[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)InventoryFragment</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >#   fireStoreHelper: FireStoreHelper [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   mParam1: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   mParam2: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   productsAdapter: ProductsAdapter [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   rvProducts: RecyclerView [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ getAllSuccess(products: ArrayList&lt;Product&gt;)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ getOneSuccess(product: Product)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ newInstance(param1: String, param2: String): InventoryFragment</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onCreate(savedInstanceState: Bundle)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onProductsLoaded(products: ArrayList&lt;Product&gt;)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onResume()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onStart()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onStop()</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+LogInActivity453036289[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)LogInActivity</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   email: EditText [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   fbAuthHelper: FBAuthHelper [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   fireStoreHelper: FireStoreHelper [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   loginButton: Button [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   password: EditText [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   signupText: TextView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   user: FirebaseUser [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >- checkEmailValidity(eMail: String): boolean</TD></TR>
+<TR><TD ALIGN="LEFT" >- checkPasswordValidity(passWord: String): boolean</TD></TR>
+<TR><TD ALIGN="LEFT" >+ createUserSuccess(user: FirebaseUser)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ loginSuccess(user: FirebaseUser)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ logoutSuccess(user: FirebaseUser)</TD></TR>
+<TR><TD ALIGN="LEFT" ># onCreate(savedInstanceState: Bundle)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+OrderDetailsActivity453036289[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)OrderDetailsActivity</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >#   Uemail: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   acceptBtn: Button [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   docId: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   fireStoreHelper: FireStoreHelper [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   orderProductsIDs: ArrayList&lt;String&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   productsAdapter: ProductsAdapter [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   rvOrderProducts: RecyclerView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   tvOrderCost: TextView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   tvTimestamp: TextView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   tvUid: TextView [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ getAllSuccess(products: ArrayList&lt;Product&gt;)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ getOneSuccess(product: Product)</TD></TR>
+<TR><TD ALIGN="LEFT" ># onCreate(savedInstanceState: Bundle)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onProductsLoaded(products: ArrayList&lt;Product&gt;)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onResume()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onStart()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onStop()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ orderToString(orderProductsIDs: ArrayList&lt;String&gt;, listener: FBReply): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ sendEmail(orderProductsIDs: ArrayList&lt;String&gt;)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+ProductDetailsActivity453036289[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)ProductDetailsActivity</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >#   addToCartBtn: Button [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   docId: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   fbAuthHelper: FBAuthHelper [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   id: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   isUser: boolean [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   ivImage: ImageView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   sp: SharedPreferences [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   tvDetails: TextView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   tvName: TextView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   tvPrice: TextView [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ editCart(ids: List&lt;String&gt;, id: String)</TD></TR>
+<TR><TD ALIGN="LEFT" ># onCreate(savedInstanceState: Bundle)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+ProductsAdapter453036289[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)ProductsAdapter</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   context: Context [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   isUser: boolean [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   product: Product [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" ># onBindViewHolder(holder: ProductViewHolder, position: int, product: Product)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onCreateViewHolder(parent: ViewGroup, viewType: int): ProductViewHolder</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+SignInActivity453036289[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)SignInActivity</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   chances: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   checkBox: CheckBox [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   eMail: EditText [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   fbAuthHelper: FBAuthHelper [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   fireStoreHelper: FireStoreHelper [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   loginText: TextView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   password: EditText [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   signinButton: Button [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   verPass: EditText [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >- checkEmailValidity(email: String): boolean</TD></TR>
+<TR><TD ALIGN="LEFT" >- checkPasswordValidity(passWord: String): boolean</TD></TR>
+<TR><TD ALIGN="LEFT" >+ createUserSuccess(user: FirebaseUser)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ getAllSuccess(products: ArrayList&lt;Product&gt;)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ getOneSuccess(product: Product)</TD></TR>
+<TR><TD ALIGN="LEFT" >- isManager(userInput: String): boolean</TD></TR>
+<TR><TD ALIGN="LEFT" >+ loginSuccess(user: FirebaseUser)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ logoutSuccess(user: FirebaseUser)</TD></TR>
+<TR><TD ALIGN="LEFT" ># onCreate(savedInstanceState: Bundle)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onProductsLoaded(products: ArrayList&lt;Product&gt;)</TD></TR>
+<TR><TD ALIGN="LEFT" >- verifyPassword(passWord: String, verpass: String): boolean</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+UserActivity453036289[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)UserActivity</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >#   cart: ImageButton [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   fbAuthHelper: FBAuthHelper [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   fireStoreHelper: FireStoreHelper [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   logout: ImageButton [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   previousQuery: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   productsAdapter: ProductsAdapter [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   rvProducts: RecyclerView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   searchBar: SearchView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   searchRunnable: Runnable [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   sp: SharedPreferences [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ createUserSuccess(user: FirebaseUser)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ loginSuccess(user: FirebaseUser)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ logoutSuccess(user: FirebaseUser)</TD></TR>
+<TR><TD ALIGN="LEFT" ># onCreate(savedInstanceState: Bundle)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onResume()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onStart()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onStop()</TD></TR>
+<TR><TD ALIGN="LEFT" >- performSearch(query: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ search()</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+} 
+} 
+
+'edges    
+CartActivity453036289 -> FireStoreHelper453628606[label="fireStoreHelper
+[0..1]"];
+EditProductActivity453036289 -> FireStoreHelper453628606[label="fireStoreHelper
+[0..1]"];
+FBAuthHelper453628606 -> LogInActivity453036289[label="fbReply
+[0..1]", arrowhead=none];
+FireStoreHelper453628606 -> SignInActivity453036289[label="fbReply
+[0..1]", arrowhead=none];
+HomeActivity453036289 -> FBAuthHelper453628606[label="fbAuthHelper
+[0..1]"];
+InventoryFragment453036289 -> FireStoreHelper453628606[label="fireStoreHelper
+[0..1]"];
+LogInActivity453036289 -> FBAuthHelper453628606[label="fbAuthHelper
+[0..1]"];
+LogInActivity453036289 -> FireStoreHelper453628606[label="fireStoreHelper
+[0..1]"];
+LogInActivity453036289 -> HomeActivity453036289[arrowhead=none];
+LogInActivity453036289 -> SignInActivity453036289[arrowhead=none];
+LogInActivity453036289 -> UserActivity453036289[arrowhead=none];
+OrderDetailsActivity453036289 -> FireStoreHelper453628606[label="fireStoreHelper
+[0..1]"];
+ProductDetailsActivity453036289 -> FBAuthHelper453628606[label="fbAuthHelper
+[0..1]"];
+SignInActivity453036289 -> AdminPasswordChecker461170758[label="isManager() -> validatePassword()"];
+SignInActivity453036289 -> CartActivity453036289[arrowhead=none];
+SignInActivity453036289 -> FBAuthHelper453628606[label="fbAuthHelper
+[0..1]"];
+SignInActivity453036289 -> FireStoreHelper453628606[label="fireStoreHelper
+[0..1]"];
+SignInActivity453036289 -> InventoryFragment453036289[arrowhead=none];
+SignInActivity453036289 -> OrderDetailsActivity453036289[arrowhead=none];
+UserActivity453036289 -> FBAuthHelper453628606[label="fbAuthHelper
+[0..1]"];
+UserActivity453036289 -> FireStoreHelper453628606[label="fireStoreHelper
+[0..1]"];
+UserActivity453036289 -> ProductsAdapter453036289[label="productsAdapter
+[0..1]"];
+    
+}
+@enduml

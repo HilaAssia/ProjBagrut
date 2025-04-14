@@ -97,7 +97,7 @@ public class Product {
         this.category = category;
     }
     public String toString(){
-        return image+","+name+","+price+","+details+","+quantity+","+forSale+","+category+","+id;
+        return "imageaddress: "+image+"/nname: "+name+"/n price: "+price+"/n details: "+details+"/n quantity: "+quantity+"/n category:"+category+"/n id:"+id;
     }
 
     public void setId(String id) {

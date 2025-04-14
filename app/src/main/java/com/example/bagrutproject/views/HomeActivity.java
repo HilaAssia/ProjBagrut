@@ -3,7 +3,6 @@ package com.example.bagrutproject.views;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,16 +10,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.bagrutproject.utils.FBAuthHelper;
 import com.example.bagrutproject.R;
 import com.example.bagrutproject.databinding.ActivityHomeBinding;
+import com.example.bagrutproject.utils.FBAuthHelper;
 import com.google.firebase.auth.FirebaseUser;
 
 public class HomeActivity extends AppCompatActivity implements FBAuthHelper.FBReply {
 
     private FBAuthHelper fbAuthHelper;
     ActivityHomeBinding binding;
-    View view;
     @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +29,9 @@ public class HomeActivity extends AppCompatActivity implements FBAuthHelper.FBRe
 
         binding.bottomNavigationView.setOnItemReselectedListener(item -> {
             switch (item.getItemId()){
+                case R.id.ordersItem:
+                    replaceFragment(new OrdersFragment());
+                    break;
                 case R.id.productsItem:
                     replaceFragment(new ForSaleFragment());
                     break;

@@ -28,7 +28,7 @@ public class FireStoreHelper {
     public interface FBReply {
         void getAllSuccess(ArrayList<Product> products);
         void getOneSuccess(Product product);
-        Product[] onProductsLoaded(Product[] products);
+        void onProductsLoaded(ArrayList<Product> products);
     }
 
     public FireStoreHelper(FireStoreHelper.FBReply fbReply) {
@@ -130,4 +130,11 @@ public class FireStoreHelper {
         return collectionRefCat;
     }
     public static CollectionReference getCollectionRefOrder(){return collectionRefOrder;}
+    public static FirebaseUser getCurrentUser(){
+        return currentUser;
+    }
+
+    public static void setCurrentUser(FirebaseUser currentUser) {
+        FireStoreHelper.currentUser = currentUser;
+    }
 }

@@ -155,8 +155,8 @@ public class InventoryFragment extends Fragment implements FireStoreHelper.FBRep
     }
 
     @Override
-    public Product[] onProductsLoaded(Product[] products) {
-        return products;
+    public void onProductsLoaded(ArrayList<Product> products) {
+
     }
 
 }

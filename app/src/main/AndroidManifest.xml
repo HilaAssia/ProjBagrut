@@ -16,6 +16,9 @@
         android:theme="@style/Theme.BagrutProject"
         tools:targetApi="31">
         <activity
+            android:name=".views.OrderDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".views.ProductDetailsActivity"
             android:exported="false" />
         <activity
@@ -31,7 +34,7 @@
             android:name=".views.HomeActivity"
             android:exported="false" />
         <activity
-            android:name=".views.SignInActivity"
+            android:name=".views.SignUpActivity"
             android:exported="false" />
         <activity
             android:name=".views.LogInActivity"

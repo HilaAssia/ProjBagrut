@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.bagrutproject.R;
+import com.example.bagrutproject.utils.FBAuthHelper;
 import com.example.bagrutproject.utils.ImageUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -22,6 +23,7 @@ import java.util.List;
 
 public class ProductDetailsActivity extends AppCompatActivity {
 
+    FBAuthHelper fbAuthHelper;
     SharedPreferences sp;
     ImageView ivImage;
     TextView tvName, tvPrice, tvDetails;
@@ -35,6 +37,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_details);
 
+        fbAuthHelper=new FBAuthHelper(this,null);
         ivImage=findViewById(R.id.imageView);
         tvName=findViewById(R.id.tvName);
         tvPrice=findViewById(R.id.tvPrice);
@@ -61,6 +64,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
                     editCart(new ArrayList<String>(), id);
                 Intent intent=new Intent(ProductDetailsActivity.this,UserActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -70,7 +74,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
     public void editCart(List<String> ids, String id){
         // יצירת SharedPreferences
-        SharedPreferences sp = getSharedPreferences("cart", 0);
+        sp = getSharedPreferences(fbAuthHelper.getCurrentUser().getUid(), 0);
         SharedPreferences.Editor editor = sp.edit();
         ids.add(id);
 
@@ -84,7 +88,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
     }
 
     public List<String> getCartItems(){
-        sp = getSharedPreferences("cart", 0);
+        sp = getSharedPreferences(fbAuthHelper.getCurrentUser().getUid(), 0);
         String json = sp.getString("productList", ""); // מקבל את ה-JSON
         Gson gson = new Gson();
 

@@ -11,5 +11,8 @@
     <item android:title="Products"
         android:icon="@drawable/baseline_attach_money_24"
         android:id="@+id/productsItem"/>
+    <item android:title="Orders"
+        android:icon="@drawable/baseline_storefront_24"
+        android:id="@+id/ordersItem"/>
 
 </menu>
