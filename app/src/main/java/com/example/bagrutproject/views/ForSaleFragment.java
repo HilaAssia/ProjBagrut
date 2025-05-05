@@ -5,23 +5,27 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.bagrutproject.utils.FireStoreHelper;
 import com.example.bagrutproject.R;
 import com.example.bagrutproject.model.Product;
+import com.example.bagrutproject.utils.FireStoreHelper;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.Query;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link ForSaleFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ForSaleFragment extends Fragment {
+public class ForSaleFragment extends Fragment implements FireStoreHelper.FBReply {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -34,6 +38,7 @@ public class ForSaleFragment extends Fragment {
 
     ProductsAdapter productsAdapter;
     RecyclerView rvSell;
+    FireStoreHelper fireStoreHelper;
 
     public ForSaleFragment() {
         // Required empty public constructor
@@ -71,6 +76,7 @@ public class ForSaleFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_for_sale, container, false);
+        fireStoreHelper=new FireStoreHelper(this);
         rvSell= (RecyclerView) view.findViewById(R.id.rvSell);
         // Inflate the layout for this fragment
         setupRecyclerView();
@@ -84,7 +90,7 @@ public class ForSaleFragment extends Fragment {
         FirestoreRecyclerOptions<Product> options=new FirestoreRecyclerOptions.Builder<Product>()
                 .setQuery(query, Product.class).build();
         rvSell.setLayoutManager(new LinearLayoutManager(ForSaleFragment.this.getContext()));
-        productsAdapter = new ProductsAdapter(options,ForSaleFragment.this.getContext(),false);
+        productsAdapter = new ProductsAdapter(options,ForSaleFragment.this.getContext(),false,fireStoreHelper);
         rvSell.setAdapter(productsAdapter);
     }
 
@@ -106,4 +112,25 @@ public class ForSaleFragment extends Fragment {
         productsAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void getAllSuccess(ArrayList<Product> products) {
+
+    }
+
+    @Override
+    public void getOneSuccess(Product product) {
+
+    }
+
+    @Override
+    public void onProductsLoaded(ArrayList<Product> products) {
+
+    }
+
+    @Override
+    public void onDeleteSuccess() {
+        FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+        ft.detach(this).attach(this).commit();
+        Toast.makeText(this.getContext(), "Product deleted", Toast.LENGTH_SHORT).show();
+    }
 }

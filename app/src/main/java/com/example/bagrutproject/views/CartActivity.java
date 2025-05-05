@@ -1,6 +1,5 @@
 package com.example.bagrutproject.views;
 
-import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,156 +24,211 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CartActivity extends AppCompatActivity implements FireStoreHelper.FBReply {
 
-    FireStoreHelper fireStoreHelper;
-    SharedPreferences sp;
-    CartAdapter cartAdapter;
-    RecyclerView rvProducts;
-    TextView tvTotalPrice;
-    Button buyBtn;
-    ArrayList<Product> order;
-    double totalPrice;
+    FireStoreHelper fireStoreHelper; // עוזר לביצוע פעולות על Firestore
+    CartAdapter cartAdapter; // מתאם להצגת מוצרים בעגלה
+    RecyclerView rvProducts; // רכיב להצגת המוצרים
+    TextView tvTotalPrice; // תצוגה של המחיר הכולל
+    Button buyBtn; // כפתור רכישה
+    ArrayList<Product> order; // רשימת המוצרים בעגלה
+    double totalPrice; // מחיר כולל של כל המוצרים
+    static HashMap<String,Integer> productInventoryQuantity;
 
-    @SuppressLint("MissingInflatedId")
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cart);
+    protected void onCreate(Bundle savedInstanceState) { // פונקציה שמופעלת כשהמסך נוצר
+        super.onCreate(savedInstanceState); // קריאה לפונקציית העל
+        setContentView(R.layout.activity_cart); // קישור למסך הפעולה (activity_cart)
 
-        fireStoreHelper=new FireStoreHelper(this);
-        rvProducts=findViewById(R.id.crvProducts);
-        tvTotalPrice=findViewById(R.id.tvTotalPrice);
-        order=new ArrayList<>();
-        getOrder(getCartItems(),CartActivity.this);
-        buyBtn=findViewById(R.id.button);
+        // אתחול רכיבים
+        fireStoreHelper = new FireStoreHelper(this);
+        rvProducts = findViewById(R.id.crvProducts);
+        tvTotalPrice = findViewById(R.id.tvTotalPrice);
+        buyBtn = findViewById(R.id.button);
+        order = new ArrayList<>();
+        productInventoryQuantity=new HashMap<>();
+
+        // קבלת המוצרים מהעגלה והבאתם מהמסד
+        getOrder(getCartItems(), CartActivity.this);
+
+        // טיפול בלחיצה על כפתור הקנייה
         buyBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Order order=new Order(CartActivity.this.order,fireStoreHelper.getCurrentUser().getUid(),String.valueOf(totalPrice),fireStoreHelper.getCurrentUser().getEmail());
-                fireStoreHelper.add(order,CartActivity.this);
-                updateProductQuantity(order.getProducts(),1);
-                Toast.makeText(CartActivity.this, "you will get an email when your order is ready :)", Toast.LENGTH_SHORT).show();
+                if (order.isEmpty()) { // אם העגלה ריקה
+                    Toast.makeText(CartActivity.this, "Cart is empty!", Toast.LENGTH_SHORT).show(); // הצגת הודעה
+                    return; // יציאה מהפונקציה
+                }
+                // אם יש מוצרים בעגלה: יצירת אובייקט של הזמנה חדשה
+                Order newOrder = new Order(
+                        CartActivity.this.order, // העתקת המוצרים
+                        fireStoreHelper.getCurrentUser().getUid(), // הוספת מזהה משתמש
+                        String.valueOf(totalPrice), // הוספת מחיר סופי
+                        fireStoreHelper.getCurrentUser().getEmail() // הוספת כתובת אימייל
+                );
+                if (updateInventoryQuantity(newOrder.getProducts())) { // עדכון כמויות מלאי
+                    fireStoreHelper.add(newOrder, CartActivity.this); // הוספת ההזמנה למסד הנתונים
+                    Toast.makeText(CartActivity.this, "You will get an email when your order is ready :) ", Toast.LENGTH_SHORT).show(); // הצגת הודעה למשתמש
+                }
+                else
+                    Toast.makeText(CartActivity.this, "one or more of your order is out of stock!", Toast.LENGTH_SHORT).show();
             }
         });
 
+
+        // הגדרת ה-RecyclerView להצגת מוצרים
         setupRecyclerView(getCartItems());
     }
 
-    private void setupRecyclerView(List<String> ids){
-        if (ids!=null && !ids.isEmpty()){
-            // עכשיו נבצע את השאילתה עבור המוצרים עם ה-IDs האלו
-            Query query = FireStoreHelper.getCollectionRefProduct()
-                    .whereIn("id", ids)  // מחפש רק את המוצרים עם מזהים ברשימה
-                    .orderBy("name", Query.Direction.DESCENDING);  // ניתן להוסיף סידור אם צריך
-
-            FirestoreRecyclerOptions<Product> options = new FirestoreRecyclerOptions.Builder<Product>()
-                    .setQuery(query, Product.class).build();
-
-            rvProducts.setLayoutManager(new LinearLayoutManager(CartActivity.this));
-            cartAdapter = new CartAdapter(options, CartActivity.this);
-            rvProducts.setAdapter(cartAdapter);
-        }
-        //String docId = sp.getString("product",null);
-        else {
-            // במקרה שאין מוצרים ברשימה או שהיא ריקה, תוכל להציג הודעה או לפעול אחרת
-            Log.d("CartActivity", "No products to display.");
-        }
-    }
-
-    public void setTotalPrice(ArrayList<Product> products){
-        totalPrice=0;
-        for (Product product:products){
-            totalPrice+=Integer.parseInt(product.getPrice());
-        }
-        tvTotalPrice.setText(tvTotalPrice.getText()+String.valueOf(totalPrice));
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (cartAdapter!=null)
-            cartAdapter.startListening();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (cartAdapter!=null)
-            cartAdapter.stopListening();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (cartAdapter!=null)
-            cartAdapter.notifyDataSetChanged();
-    }
-
-    public List<String> getCartItems(){
-        sp = getSharedPreferences(fireStoreHelper.getCurrentUser().getUid(), 0);
-        String json = sp.getString("productList", ""); // מקבל את ה-JSON
+    // שליפת רשימת מזהים של מוצרים מהזיכרון המקומי
+    public List<String> getCartItems() {
+        SharedPreferences sp = getSharedPreferences(fireStoreHelper.getCurrentUser().getEmail(), 0);
+        String json = sp.getString("cartMap", null); // שליפת מפת העגלה
         Gson gson = new Gson();
 
-        // המרת ה-JSON חזרה לרשימה
-        Type type = new TypeToken<List<String>>(){}.getType();
-        List<String> Ids = gson.fromJson(json, type);
+        Type type = new TypeToken<Map<String, Integer>>() {}.getType();
+        Map<String, Integer> cartMap = gson.fromJson(json, type);
 
-        return Ids;
+        if (cartMap == null) {
+            return new ArrayList<>(); // עגלה ריקה
+        }
+
+        return new ArrayList<>(cartMap.keySet()); // מחזיר את כל ה-productId ברשימה
     }
 
-    public void getOrder(List<String> ids, FireStoreHelper.FBReply listener){
-        ArrayList<Product> o=new ArrayList<>();
-        // בדיקה אם הרשימה ריקה
-        if (ids == null || ids.isEmpty()) {
-            listener.onProductsLoaded(o); // מחזיר מערך ריק אם אין IDs
-            return;
+    public int getProductQuantity(String productId) {
+        SharedPreferences sp = getSharedPreferences(fireStoreHelper.getCurrentUser().getEmail(), 0);
+        String json = sp.getString("cartMap", null); // שליפת העגלה כ-JSON
+        Gson gson = new Gson();
+
+        Type type = new TypeToken<Map<String, Integer>>() {}.getType();
+        Map<String, Integer> cartMap = gson.fromJson(json, type);
+
+        if (cartMap != null && cartMap.containsKey(productId)) {
+            return cartMap.get(productId);
         }
-        fireStoreHelper.getCollectionRefProduct().whereIn("id", ids) // מחפש את כל המוצרים עם ה-IDs ברשימה
+
+        return 0; // אם לא קיים – נחזיר 0
+    }
+
+    // טעינת פרטי המוצרים לפי מזהים מהמסד
+    public void getOrder(List<String> ids, FireStoreHelper.FBReply listener) {
+        ArrayList<Product> tempOrder = new ArrayList<>(); // יצירת רשימה זמנית של מוצרים
+        if (ids == null || ids.isEmpty()) { // אם הרשימה ריקה
+            listener.onProductsLoaded(tempOrder); // החזרת רשימה ריקה
+            return;//סיום הפעולה
+        }
+
+        fireStoreHelper.getCollectionRefProduct().whereIn("id", ids) // חיפוש מוצרים לפי מזהים
                 .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Product product = document.toObject(Product.class); // המרה למסד הנתונים
-                            o.add(product);
+                .addOnCompleteListener(task -> { // האזנה להשלמת החיפוש
+                    if (task.isSuccessful() && task.getResult() != null) { // אם החיפוש הצליח
+                        for (QueryDocumentSnapshot document : task.getResult()) { // מעבר על כל תוצאה
+                            Product product = document.toObject(Product.class); // המרת מסמך לאובייקט Product
+                            productInventoryQuantity.put(product.getId(),product.getQuantity());
+                            product.setQuantity(getProductQuantity(product.getId()));
+                            tempOrder.add(product); // הוספת המוצר לרשימה
                         }
                     }
-                    listener.onProductsLoaded(o); // במקרה של שגיאה מחזירים מערך ריק
+                    listener.onProductsLoaded(tempOrder); // קריאה חזרה עם הרשימה
                 });
-
-        Toast.makeText(this, this.order.size()+" מוצרים בעגלה", Toast.LENGTH_SHORT).show();
-
     }
 
-    @Override
-    public void getAllSuccess(ArrayList<Product> products) {
-
+    // חישוב ועדכון מחיר כולל
+    public void setTotalPrice(ArrayList<Product> products) {
+        totalPrice = 0; // איפוס מחיר
+        for (Product product : products) { // מעבר על כל מוצר
+            totalPrice += Double.parseDouble(product.getPrice())*product.getQuantity(); // חיבור מחיר המוצר לסכום הכללי
+        }
+        tvTotalPrice.setText("Total: " + totalPrice + "₪"); // הצגת המחיר הכולל במסך
     }
 
-    @Override
-    public void getOneSuccess(Product product) {
-
-    }
-
-    @Override
-    public void onProductsLoaded(ArrayList<Product> products) {
-        order=products;
-        setTotalPrice(order);
-        Toast.makeText(this, products.size()+"products loaded", Toast.LENGTH_SHORT).show();
-    }
-
-    public void updateProductQuantity(ArrayList<Product> order, int purchasedQuantity) {
-        for (Product p:order){
-            if (p.getQuantity()-purchasedQuantity<=0)
-                Toast.makeText(this, "this product is out of stock!!!", Toast.LENGTH_LONG).show();
-            else {
-                p.setQuantity(p.getQuantity()-purchasedQuantity);
-                fireStoreHelper.update(p.getId(),p);
-                Toast.makeText(this, p.getQuantity()+" items are in stock", Toast.LENGTH_LONG).show();
+    // עדכון כמויות מוצרים במלאי אחרי רכישה
+    public boolean updateInventoryQuantity(ArrayList<Product> order) {
+        for (Product p : order) { // לולאה שעוברת על כל המוצרים בהזמנה
+            if (productInventoryQuantity.get(p.getId()) - p.getQuantity() < 0) { // אם אין מספיק מלאי
+                Toast.makeText(this, p.getName() + ": is out of stock!!!", Toast.LENGTH_LONG).show(); // הודעת חוסר מלאי
+                return false;
             }
+            else {// אם יש מספיק מלאי
+                p.setQuantity(productInventoryQuantity.get(p.getId()) - p.getQuantity()); // הורדת הכמות במלאי
+                fireStoreHelper.update(p.getId(), p); // עדכון המוצר במסד הנתונים
+                Toast.makeText(this, p.getQuantity() + " items are in stock", Toast.LENGTH_LONG).show(); // הצגת הכמות החדשה
+            }
+        }
+        return true;
+    }
+
+    // הגדרת RecyclerView להצגת המוצרים לפי המזהים
+    private void setupRecyclerView(List<String> ids) {
+        if (ids != null && !ids.isEmpty()) { // אם יש מוצרים להציג
+            Query query = FireStoreHelper.getCollectionRefProduct()
+                    .whereIn("id", ids) // יצירת שאילתה לפי מזהים
+                    .orderBy("name", Query.Direction.DESCENDING); // סידור תוצאות לפי שם מוצר
+
+            FirestoreRecyclerOptions<Product> options = new FirestoreRecyclerOptions.Builder<Product>()
+                    .setQuery(query, Product.class) // הגדרת שאילתה והתוצאה כ-Product
+                    .build();
+
+            rvProducts.setLayoutManager(new LinearLayoutManager(CartActivity.this)); // קביעת סידור ליניארי של המוצרים
+            cartAdapter = new CartAdapter(options, CartActivity.this, fireStoreHelper.getCurrentUser()); // יצירת מתאם לרשימה
+            rvProducts.setAdapter(cartAdapter); // חיבור המתאם ל-RecyclerView
+        } else {
+            Log.d("CartActivity", "No products to display."); // הודעת דיבוג שאין מוצרים
         }
     }
 
+    @Override
+    public void onStart() { // כשהמסך מתחיל להופיע
+        super.onStart();
+        if (cartAdapter != null)
+            cartAdapter.startListening(); // התחלת האזנה לשינויים במוצרים
+    }
+
+    @Override
+    public void onStop() { // כשהמסך מפסיק להופיע
+        super.onStop();
+        if (cartAdapter != null)
+            cartAdapter.stopListening(); // עצירת האזנה לשינויים
+    }
+
+    @Override
+    public void onResume() { // כשהמשתמש חוזר למסך
+        super.onResume();
+        if (cartAdapter != null)
+            cartAdapter.notifyDataSetChanged(); // רענון התצוגה
+    }
+
+    // מימוש ריק של קבלת כל המוצרים (נדרש מהממשק FBReply)
+    @Override
+    public void getAllSuccess(ArrayList<Product> products) {}
+
+    // מימוש ריק של קבלת מוצר בודד (נדרש מהממשק FBReply)
+    @Override
+    public void getOneSuccess(Product product) {}
+
+    // תגובה לטעינת המוצרים מהמסד
+    @Override
+    public void onProductsLoaded(ArrayList<Product> products) {
+        this.order = products; // שמירת המוצרים ברשימת העגלה
+        if (products.isEmpty()) { // אם אין מוצרים
+            Toast.makeText(this, "Cart is empty", Toast.LENGTH_SHORT).show(); // הודעה על עגלה ריקה
+        } else {
+            setTotalPrice(order); // חישוב ואיתחול מחיר כולל
+            Toast.makeText(this, products.size() + " products loaded", Toast.LENGTH_SHORT).show(); // הודעה על מספר מוצרים שהועמסו
+        }
+    }
+
+    @Override
+    public void onDeleteSuccess() {
+
+    }
+
+    public static int getProductInventoryQuantity(String id){
+        return productInventoryQuantity.get(id);
+    }
 }

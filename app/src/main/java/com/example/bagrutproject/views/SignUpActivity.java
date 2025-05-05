@@ -138,7 +138,7 @@ public class SignUpActivity extends AppCompatActivity implements FBAuthHelper.FB
                     Manager manager = new Manager(user.getEmail(), user.getUid());
                     fireStoreHelper.add(manager);
 
-                    Intent intent = new Intent(SignUpActivity.this, HomeActivity.class);
+                    Intent intent = new Intent(SignUpActivity.this, ManagerActivity.class);
                     startActivity(intent);
                     finish();
                     dialog.dismiss();
@@ -179,4 +179,9 @@ public class SignUpActivity extends AppCompatActivity implements FBAuthHelper.FB
 
     @Override
     public void onProductsLoaded(ArrayList<Product> products) {}
+
+    @Override
+    public void onDeleteSuccess() {
+
+    }
 }

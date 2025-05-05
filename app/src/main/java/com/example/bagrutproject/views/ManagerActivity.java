@@ -11,19 +11,19 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.bagrutproject.R;
-import com.example.bagrutproject.databinding.ActivityHomeBinding;
+import com.example.bagrutproject.databinding.ActivityManagerBinding;
 import com.example.bagrutproject.utils.FBAuthHelper;
 import com.google.firebase.auth.FirebaseUser;
 
-public class HomeActivity extends AppCompatActivity implements FBAuthHelper.FBReply {
+public class ManagerActivity extends AppCompatActivity implements FBAuthHelper.FBReply {
 
     private FBAuthHelper fbAuthHelper;
-    ActivityHomeBinding binding;
+    ActivityManagerBinding binding;
     @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityHomeBinding.inflate(getLayoutInflater());
+        binding = ActivityManagerBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         replaceFragment(new InventoryFragment());
 
@@ -40,7 +40,7 @@ public class HomeActivity extends AppCompatActivity implements FBAuthHelper.FBRe
                     break;
                 case R.id.LogoutItem:
                     fbAuthHelper.logoutUser();
-                    Intent intent = new Intent(HomeActivity.this, LogInActivity.class);
+                    Intent intent = new Intent(ManagerActivity.this, LogInActivity.class);
                     startActivity(intent);
                     break;
             }

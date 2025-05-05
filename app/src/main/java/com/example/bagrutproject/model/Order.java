@@ -3,6 +3,7 @@ package com.example.bagrutproject.model;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Order {
     ArrayList<Product> products;
@@ -19,8 +20,7 @@ public class Order {
         this.timestamp = new SimpleDateFormat("dd/MM/yy  HH:mm").format(new Date());
     }
 
-    public ArrayList<String> getProductsIDs() {
-        ArrayList<String> ids=new ArrayList<>();
+    public ArrayList<String> getProductsIDs(ArrayList<String> ids) {
         for (Product p:this.products){
             ids.add(p.getId());
         }
@@ -65,5 +65,17 @@ public class Order {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public static String productsToString(List<Product> products) {
+        StringBuilder result = new StringBuilder();
+
+        if (products != null) {
+            for (Product p : products) {
+                result.append(p.toString()).append("\n--------------------\n");
+            }
+        }
+
+        return result.toString();
     }
 }

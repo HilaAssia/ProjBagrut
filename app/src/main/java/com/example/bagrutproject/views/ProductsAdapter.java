@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bagrutproject.R;
 import com.example.bagrutproject.model.Product;
+import com.example.bagrutproject.utils.FireStoreHelper;
 import com.example.bagrutproject.utils.ImageUtils;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -23,13 +24,14 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
     private Context context;
     boolean isUser;
     Product product;
+    FireStoreHelper fireStoreHelper;
 
-    public ProductsAdapter(FirestoreRecyclerOptions<Product> options, Context context, boolean isUser) {
+    public ProductsAdapter(FirestoreRecyclerOptions<Product> options, Context context, boolean isUser, FireStoreHelper fireStoreHelper) {
         super(options);
         this.context=context;
         this.isUser=isUser;
+        this.fireStoreHelper=fireStoreHelper;
     }
-
 
     @Override
     protected void onBindViewHolder(@NonNull ProductViewHolder holder, int position, @NonNull Product product) {
@@ -37,17 +39,20 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
         if (product.getImage()!=null)
             holder.ivImage.setImageBitmap(ImageUtils.convertStringToBitmap(product.getImage()));
         holder.tvName.setText(product.getName());
-        holder.tvPrice.setText(product.getPrice());
+        holder.tvPrice.setText(product.getPrice()+"₪");
         holder.tvDetails.setText(product.getDetails());
-        holder.tvQuantity.setText(Integer.toString(product.getQuantity()));
         holder.tvCategory.setText(product.getCategory());
 
         if(!isUser){
+            holder.tvQuantity.setText(String.valueOf(product.getQuantity()));
             holder.ibIncrease.setOnClickListener(v -> {
-                product.quantityAdd(1);
+                increaseQuantity(product);
             });
             holder.ibDecrease.setOnClickListener(v -> {
-                product.quantityAdd(-1);
+                decreaseQuantity(product);
+            });
+            holder.ibDelete.setOnClickListener(v ->  {
+                deleteProduct(product);
             });
             holder.itemView.setOnClickListener(v-> {
                 Intent intent = new Intent(context, EditProductActivity.class);
@@ -67,6 +72,11 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
         }
 
         else {
+            holder.tvQuantity.setVisibility(View.GONE);
+            holder.ibIncrease.setVisibility(View.GONE);
+            holder.ibDecrease.setVisibility(View.GONE);
+            holder.ibDelete.setVisibility(View.GONE);
+
             holder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(context, ProductDetailsActivity.class);
                 intent.putExtra("image", product.getImage());
@@ -94,7 +104,7 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
     public class ProductViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvPrice, tvDetails, tvQuantity, tvCategory;
         ImageView ivImage;
-        ImageButton ibIncrease, ibDecrease;
+        ImageButton ibIncrease, ibDecrease, ibDelete;
 
 
         public ProductViewHolder(@NonNull View itemView) {
@@ -108,6 +118,26 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
 
             ibIncrease=itemView.findViewById(R.id.btnIncrease);
             ibDecrease=itemView.findViewById(R.id.btnDecrease);
+            ibDelete=itemView.findViewById(R.id.btnDelete);
         }
     }
+
+    private void increaseQuantity(Product product) {
+        product.quantityAdd(1);
+        fireStoreHelper.update(product.getId(), product);
+    }
+
+    private void decreaseQuantity(Product product) {
+        if (product.getQuantity() > 1) {
+            product.quantityAdd(-1);
+            fireStoreHelper.update(product.getId(), product);
+        } else {
+            deleteProduct(product);
+        }
+    }
+
+    private void deleteProduct(Product product) {
+        fireStoreHelper.delete(product.getId());
+    }
+
 }

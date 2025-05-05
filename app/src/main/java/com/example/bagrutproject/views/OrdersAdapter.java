@@ -15,6 +15,8 @@ import com.example.bagrutproject.model.Order;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
+import java.util.ArrayList;
+
 public class OrdersAdapter extends FirestoreRecyclerAdapter<Order, OrdersAdapter.OrderViewHolder> {
     private Context context;
     Order order;
@@ -27,15 +29,16 @@ public class OrdersAdapter extends FirestoreRecyclerAdapter<Order, OrdersAdapter
     @Override
     protected void onBindViewHolder(@NonNull OrderViewHolder holder, int position, @NonNull Order order) {
         this.order=order;
-        holder.tvUid.setText(order.getUid());
-        holder.tvTP.setText(order.getTotalPrice());
+        holder.tvUid.setText(order.getEmail());
+        holder.tvTP.setText(order.getTotalPrice()+"₪");
         holder.tvTimestamp.setText(order.getTimestamp());
 
         holder.itemView.setOnClickListener(v -> {
+            ArrayList<String> ids=new ArrayList<>();
             Intent intent = new Intent(context, OrderDetailsActivity.class);
             intent.putExtra("uid", order.getUid());
             intent.putExtra("email", order.getEmail());
-            intent.putStringArrayListExtra("products", order.getProductsIDs());
+            intent.putStringArrayListExtra("products", order.getProductsIDs(ids));
             intent.putExtra("cost", order.getTotalPrice());
             intent.putExtra("timestamp", order.getTimestamp());
 

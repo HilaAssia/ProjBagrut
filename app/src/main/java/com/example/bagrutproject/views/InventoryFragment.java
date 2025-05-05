@@ -8,15 +8,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.bagrutproject.model.Category;
-import com.example.bagrutproject.utils.FireStoreHelper;
 import com.example.bagrutproject.R;
+import com.example.bagrutproject.model.Category;
 import com.example.bagrutproject.model.Product;
+import com.example.bagrutproject.utils.FireStoreHelper;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.Query;
 
@@ -82,7 +85,7 @@ public class InventoryFragment extends Fragment implements FireStoreHelper.FBRep
         rvProducts= (RecyclerView) view.findViewById(R.id.rvProducts);
         fireStoreHelper= new FireStoreHelper(this);
         Dialog dialog = new Dialog(InventoryFragment.this.getContext());
-        Button add = (Button) view.findViewById(R.id.btnAdd);
+        ImageButton add = (ImageButton) view.findViewById(R.id.btnAdd);
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,7 +125,7 @@ public class InventoryFragment extends Fragment implements FireStoreHelper.FBRep
         FirestoreRecyclerOptions<Product> options=new FirestoreRecyclerOptions.Builder<Product>()
                 .setQuery(query, Product.class).build();
         rvProducts.setLayoutManager(new LinearLayoutManager(InventoryFragment.this.getContext()));
-        productsAdapter = new ProductsAdapter(options,InventoryFragment.this.getContext(),false);
+        productsAdapter = new ProductsAdapter(options,InventoryFragment.this.getContext(),false,fireStoreHelper);
         rvProducts.setAdapter(productsAdapter);
     }
 
@@ -157,6 +160,13 @@ public class InventoryFragment extends Fragment implements FireStoreHelper.FBRep
     @Override
     public void onProductsLoaded(ArrayList<Product> products) {
 
+    }
+
+    @Override
+    public void onDeleteSuccess() {
+        FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+        ft.detach(this).attach(this).commit();
+        Toast.makeText(this.getContext(), "Product deleted", Toast.LENGTH_SHORT).show();
     }
 
 }

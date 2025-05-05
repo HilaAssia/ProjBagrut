@@ -33,212 +33,219 @@ import java.util.ArrayList;
 
 public class EditProductActivity extends AppCompatActivity {
 
-    private ActivityResultLauncher<Void> mGetThumb;
-    private ActivityResultLauncher<String> mGetContent;
-    Spinner spinner;
-    FireStoreHelper fireStoreHelper;
-    ImageView ivImage;
-    Switch forSale;
-    EditText etName, etPrice, etDetails, etQuantity;
-    Boolean isEditMode=false;
-    Button saveBtn,deleteBtn,captureImageBtn,selectImageBtn;
-    String docId, category;
+    private ActivityResultLauncher<Void> mGetThumb; // מפעיל מצלמה ולקיחת תמונה מוקטן
+    private ActivityResultLauncher<String> mGetContent; // מפעיל בחירת תמונה מהגלריה
+    Spinner spinner; // תפריט בחירה לקטגוריות
+    FireStoreHelper fireStoreHelper; // עוזר לעבודה מול מסד נתונים Firestore
+    ImageView ivImage; // תמונת המוצר
+    Switch forSale; // מתג אם המוצר למכירה
+    EditText etName, etPrice, etDetails, etQuantity; // שדות קלט לשם, מחיר, פרטים וכמות
+    Boolean isEditMode = false; // משתנה שבודק אם אנחנו במצב עריכה
+    Button saveBtn, deleteBtn, captureImageBtn, selectImageBtn; // כפתורים לשמירה, מחיקה, צילום ובחירת תמונה
+    String docId, category; // מזהה המוצר והקטגוריה הנבחרת
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_product);
+        setContentView(R.layout.activity_add_product); // מחבר את העיצוב של הפעילות
 
-        spinner = findViewById(R.id.spinner);
-        setCategories();
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spinner = findViewById(R.id.spinner); // מוצא את הספינר מהעיצוב
+        setCategories(); // טוען קטגוריות לספינר
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() { // מאזין לבחירת קטגוריה
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                String selectedItem = parentView.getItemAtPosition(position).toString();
-                Toast.makeText(EditProductActivity.this, "בחרת: " + selectedItem, Toast.LENGTH_SHORT).show();
-                category=selectedItem;
+                String selectedItem = parentView.getItemAtPosition(position).toString(); // מקבל את הקטגוריה שנבחרה
+                Toast.makeText(EditProductActivity.this, "בחרת: " + selectedItem, Toast.LENGTH_SHORT).show(); // מציג הודעה
+                category = selectedItem; // שומר את הקטגוריה שנבחרה
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
-                // אם לא נבחר שום דבר
+                // פעולה שלא מתבצעת כלום אם לא נבחר כלום
             }
         });
-        ivImage=findViewById(R.id.imageView);
-        etName=findViewById(R.id.etName);
-        etPrice=findViewById(R.id.etPrice);
-        etDetails=findViewById(R.id.etDetails);
-        etQuantity=findViewById(R.id.etQuantity);
-        forSale=findViewById(R.id.switchForSale);
 
-        registerCameraLauncher();
-        registerForContentLauncher();
-        fireStoreHelper=new FireStoreHelper(null);
-        captureImageBtn=findViewById(R.id.btnCaptureImage);
-        captureImageBtn.setOnClickListener(new View.OnClickListener() {
+        // אתחול רכיבים גרפיים מהמסך
+        ivImage = findViewById(R.id.imageView);
+        etName = findViewById(R.id.etName);
+        etPrice = findViewById(R.id.etPrice);
+        etDetails = findViewById(R.id.etDetails);
+        etQuantity = findViewById(R.id.etQuantity);
+        forSale = findViewById(R.id.switchForSale);
+
+        registerCameraLauncher(); // רושם את הפעולה לצילום תמונה
+        registerForContentLauncher(); // רושם את הפעולה לבחירת תמונה מהגלריה
+
+        fireStoreHelper = new FireStoreHelper(null); // יוצר עוזר למסד הנתונים
+
+        captureImageBtn = findViewById(R.id.btnCaptureImage); // מוצא את כפתור הצילום
+        captureImageBtn.setOnClickListener(new View.OnClickListener() { // מאזין ללחיצה על צילום
             @Override
             public void onClick(View v) {
-                mGetThumb.launch(null);
+                mGetThumb.launch(null); // מפעיל מצלמה לצילום
             }
         });
-        selectImageBtn=findViewById(R.id.btnSelectImage);
-        selectImageBtn.setOnClickListener(new View.OnClickListener() {
+
+        selectImageBtn = findViewById(R.id.btnSelectImage); // מוצא את כפתור בחירת תמונה
+        selectImageBtn.setOnClickListener(new View.OnClickListener() { // מאזין ללחיצה על בחירת תמונה
             @Override
             public void onClick(View v) {
-                mGetContent.launch("image/*");
+                mGetContent.launch("image/*"); // פותח גלריה לבחירת תמונה
             }
         });
-        saveBtn =findViewById(R.id.btnSave);
-        saveBtn.setOnClickListener(new View.OnClickListener() {
+
+        saveBtn = findViewById(R.id.btnSave); // מוצא את כפתור השמירה
+        saveBtn.setOnClickListener(new View.OnClickListener() { // מאזין ללחיצה על שמירה
             @Override
             public void onClick(View v) {
-                if(validateInput()==true) {
-                    saveProduct(ImageUtils.getBitmapFromImageView(ivImage),
+                if (validateInput()) { // אם המידע תקין
+                    saveProduct(ImageUtils.getBitmapFromImageView(ivImage), // שומר מוצר חדש או מעודכן
                             etName.getText().toString(),
                             etPrice.getText().toString(),
                             etDetails.getText().toString(),
                             Integer.parseInt(etQuantity.getText().toString()),
-                            forSale.isChecked(), category.toString());
-                    Intent intent=new Intent(EditProductActivity.this, HomeActivity.class);
+                            forSale.isChecked(), category);
+                    Intent intent = new Intent(EditProductActivity.this, ManagerActivity.class); // עובר חזרה למסך הניהול
                     startActivity(intent);
                 }
-
             }
         });
-        deleteBtn =findViewById(R.id.btndelete);
-        deleteBtn.setOnClickListener(new View.OnClickListener() {
+
+        deleteBtn = findViewById(R.id.btndelete); // מוצא את כפתור המחיקה
+        deleteBtn.setOnClickListener(new View.OnClickListener() { // מאזין ללחיצה על מחיקה
             @Override
             public void onClick(View v) {
-                deleteProduct();
-                Intent intent=new Intent(EditProductActivity.this, HomeActivity.class);
+                deleteProduct(); // מוחק את המוצר
+                Intent intent = new Intent(EditProductActivity.this, ManagerActivity.class); // עובר חזרה למסך הניהול
                 startActivity(intent);
             }
         });
 
+        // בודק אם קיבלנו מזהה מוצר לעריכה
         docId = getIntent().getStringExtra("docId");
-        if (docId != null && !docId.isEmpty()){
-            isEditMode=true;
+        if (docId != null && !docId.isEmpty()) {
+            isEditMode = true; // מפעיל מצב עריכה
+            // ממלא את השדות הקיימים במידע שהגיע
             ivImage.setImageBitmap(ImageUtils.convertStringToBitmap(getIntent().getStringExtra("image")));
             forSale.setChecked(getIntent().getBooleanExtra("forSale", false));
             etName.setText(getIntent().getStringExtra("name"));
             etPrice.setText(getIntent().getStringExtra("price"));
             etDetails.setText(getIntent().getStringExtra("details"));
-            etQuantity.setText(Integer.toString(getIntent().getIntExtra("quantity",0)));
-            category=(getIntent().getStringExtra("category"));
-            //spinner.getAdapter().getItem(category);
-            findViewById(R.id.btndelete).setVisibility(View.VISIBLE);
+            etQuantity.setText(Integer.toString(getIntent().getIntExtra("quantity", 0)));
+            category = getIntent().getStringExtra("category");
+            findViewById(R.id.btndelete).setVisibility(View.VISIBLE); // מציג כפתור מחיקה
         }
     }
 
-    private boolean validateInput(){
+    private boolean validateInput() { // בדיקה אם השדות מולאו בצורה תקינה
         boolean isValid = true;
         if (etName.getText().toString().isEmpty()) {
             etName.setError("please enter some content");
             isValid = false;
         }
-        if (etPrice.getText().toString().isEmpty()){
+        if (etPrice.getText().toString().isEmpty()) {
             etPrice.setError("please enter some content");
             isValid = false;
         }
-        if (etDetails.getText().toString().isEmpty()){
+        if (etDetails.getText().toString().isEmpty()) {
             etDetails.setError("please enter some content");
             isValid = false;
         }
-        if (Integer.parseInt(etQuantity.getText().toString())<=0){
+        if (Integer.parseInt(etQuantity.getText().toString()) <= 0) {
             etQuantity.setError("please enter some content");
             isValid = false;
         }
-        if (category=="category"){
-            //להכין דיאלוג ששואל אם המנהל רוצה ליצור קטגוריה חדשה
+        if (category.equals("category")) { // אם לא נבחרה קטגוריה
+            // מציג דיאלוג ליצירת קטגוריה חדשה
             Dialog dialog = new Dialog(EditProductActivity.this);
             dialog.setContentView(R.layout.dialog);
             dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             dialog.setCancelable(false);
-            EditText etCategory=dialog.findViewById(R.id.etCategory);
-            Button buttonAdd=dialog.findViewById(R.id.btnAdd);
-            buttonAdd.setOnClickListener(new View.OnClickListener() {
+            EditText etCategory = dialog.findViewById(R.id.etCategory);
+            Button buttonAdd = dialog.findViewById(R.id.btnAdd);
+            buttonAdd.setOnClickListener(new View.OnClickListener() { // לחיצה על הוספת קטגוריה
                 @Override
                 public void onClick(View v) {
-                    Category cat=new Category(etCategory.getText().toString());
-                    fireStoreHelper.add(cat);
-                    setCategories();
-                    dialog.dismiss();
+                    Category cat = new Category(etCategory.getText().toString()); // יוצר קטגוריה
+                    fireStoreHelper.add(cat); // מוסיף למסד נתונים
+                    setCategories(); // מרענן קטגוריות בספינר
+                    dialog.dismiss(); // סוגר דיאלוג
                 }
             });
-            Button buttonCancel=dialog.findViewById(R.id.btnCancel);
+            Button buttonCancel = dialog.findViewById(R.id.btnCancel); // כפתור ביטול
             buttonCancel.setVisibility(View.VISIBLE);
-            buttonCancel.setOnClickListener(new View.OnClickListener() {
+            buttonCancel.setOnClickListener(new View.OnClickListener() { // מאזין ללחיצה ביטול
                 @Override
                 public void onClick(View v) {
-                    dialog.dismiss();
+                    dialog.dismiss(); // סוגר דיאלוג
                 }
             });
-            dialog.show();
-            isValid=false;
+            dialog.show(); // מציג את הדיאלוג
+            isValid = false;
         }
         return isValid;
     }
 
-    private void saveProduct(Bitmap bitmap, String name, String price, String details, int quantity, boolean forSale, String category){
-        Product product=new Product(ImageUtils.convertBitmapToString(bitmap),name,price,details,quantity,forSale,category);
-        if (isEditMode)
-            fireStoreHelper.update(docId,product);
-        else {
-            fireStoreHelper.add(product);
-        }
+    private void saveProduct(Bitmap bitmap, String name, String price, String details, int quantity, boolean forSale, String category) { // שמירה של מוצר
+        Product product = new Product(ImageUtils.convertBitmapToString(bitmap), name, price, details, quantity, forSale, category); // יוצר אובייקט מוצר
+        if (isEditMode) // אם במצב עריכה
+            fireStoreHelper.update(docId, product); // מעדכן מוצר קיים
+        else
+            fireStoreHelper.add(product); // מוסיף מוצר חדש
     }
 
-    private void deleteProduct(){
-        fireStoreHelper.delete(docId);
+    private void deleteProduct() { // מחיקת מוצר
+        fireStoreHelper.delete(docId); // מוחק לפי מזהה
     }
 
-    private void registerCameraLauncher(){
-        mGetThumb=registerForActivityResult(new ActivityResultContracts.TakePicturePreview(), new ActivityResultCallback<Bitmap>() {
+    private void registerCameraLauncher() { // רישום פעולת צילום
+        mGetThumb = registerForActivityResult(new ActivityResultContracts.TakePicturePreview(), new ActivityResultCallback<Bitmap>() {
             @Override
             public void onActivityResult(Bitmap result) {
-                ivImage.setImageBitmap(result);
+                ivImage.setImageBitmap(result); // מציג את התמונה שצולמה
             }
         });
     }
 
-    private void registerForContentLauncher(){
-        mGetContent=registerForActivityResult(new ActivityResultContracts.GetContent(), uri->{
+    private void registerForContentLauncher() { // רישום פעולת בחירת תמונה
+        mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
             try {
-               Bitmap bitmap= MediaStore.Images.Media.getBitmap(this.getContentResolver(),uri);
-               ivImage.setImageBitmap(bitmap);
-            }catch (Exception e){
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri); // מקבל תמונה מהגלריה
+                ivImage.setImageBitmap(bitmap); // מציג את התמונה
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });
     }
 
-    public void updateSpinner(ArrayList<String> items){
+    public void updateSpinner(ArrayList<String> items) { // עדכון הספינר עם רשימת קטגוריות
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, items);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // מגדיר את התצוגה של רשימת האפשרויות
-        spinner.setAdapter(adapter);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter); // מחבר את הרשימה לספינר
     }
 
-    public void setCategories(){
-        // יצירת רשימה של מיתרים שתכיל את שמות הקטגוריות
+    public void setCategories() { // שליפת קטגוריות מ-Firestore
         ArrayList<String> categoriesList = new ArrayList<>();
-        categoriesList.add("category");
+        categoriesList.add("category"); // קטגוריה ברירת מחדל
 
-        // שליפת הקטגוריות מ-Firestore
-        fireStoreHelper.getCollectionRefCat().get()
+        FireStoreHelper.getCollectionRefCat().get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            // הוספת שם הקטגוריה לרשימה
-                            String categoryName = document.getString("category");
-                            categoriesList.add(categoryName);
+                        for (QueryDocumentSnapshot document : task.getResult()) { // עובר על כל מסמך
+                            String categoryName = document.getString("category"); // מביא את שם הקטגוריה
+                            categoriesList.add(categoryName); // מוסיף לרשימה
                         }
-                        // אחרי שסיימנו לעדכן את הרשימה, תוכל להמיר אותה למערך (אם נדרש)
-                        //String[] categoriesArray = categoriesList.toArray(new String[0]);
-                        // עכשיו categoriesArray מכיל את כל הקטגוריות
-                        // אפשר לעדכן את ה-Spinner או כל רכיב אחר
-                        updateSpinner(categoriesList);
+                        updateSpinner(categoriesList); // מעדכן את הספינר
+
+                        // קוד חדש: רק אם במצב עריכה, נבחר את הקטגוריה המתאימה
+                        if (isEditMode && category != null) {
+                            int index = categoriesList.indexOf(category);
+                            if (index != -1) {
+                                spinner.setSelection(index);
+                            }
+                        }
                     } else {
-                        Log.w("Firestore", "Error getting documents.", task.getException());
+                        Log.w("Firestore", "Error getting documents.", task.getException()); // מדווח על שגיאה
                     }
                 });
     }

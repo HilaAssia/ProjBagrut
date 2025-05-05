@@ -18,8 +18,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProductDetailsActivity extends AppCompatActivity {
 
@@ -47,7 +47,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
         if (docId != null && !docId.isEmpty()){
             ivImage.setImageBitmap(ImageUtils.convertStringToBitmap(getIntent().getStringExtra("image")));
             tvName.setText(getIntent().getStringExtra("name"));
-            tvPrice.setText(getIntent().getStringExtra("price"));
+            tvPrice.setText(getIntent().getStringExtra("price")+"₪");
             tvDetails.setText(getIntent().getStringExtra("details"));
             isUser=getIntent().getBooleanExtra("isUser",false);
             id=getIntent().getStringExtra("id");
@@ -58,11 +58,8 @@ public class ProductDetailsActivity extends AppCompatActivity {
         addToCartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getCartItems()!=null)
-                    editCart(getCartItems(), id);
-                else
-                    editCart(new ArrayList<String>(), id);
-                Intent intent=new Intent(ProductDetailsActivity.this,UserActivity.class);
+                addProduct(id);
+                Intent intent=new Intent(ProductDetailsActivity.this,CartActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -72,30 +69,33 @@ public class ProductDetailsActivity extends AppCompatActivity {
             findViewById(R.id.btnAddToCart).setVisibility(View.GONE);
     }
 
-    public void editCart(List<String> ids, String id){
+    public void addProduct(String newProduct){
         // יצירת SharedPreferences
-        sp = getSharedPreferences(fbAuthHelper.getCurrentUser().getUid(), 0);
+        sp = getSharedPreferences(fbAuthHelper.getCurrentUser().getEmail(), 0);
         SharedPreferences.Editor editor = sp.edit();
-        ids.add(id);
 
-        // המרת רשימת המוצרים ל-JSON
+        // שליפת מפת העגלה הקיימת
         Gson gson = new Gson();
-        String json = gson.toJson(ids);
+        String json = sp.getString("cartMap", null);
+        Type type = new TypeToken<Map<String, Integer>>() {}.getType();
+        Map<String, Integer> cartMap = gson.fromJson(json, type);
 
-        // שמירה של הרשימה ב-SharedPreferences
-        editor.putString("productList", json);
+        if (cartMap == null) {
+            cartMap = new HashMap<>();
+        }
+
+        // עדכון הכמות למוצר הקיים או הוספת חדש
+        String productId = newProduct;
+        int newQuantity = 1;
+        if (cartMap.containsKey(productId)) {
+            cartMap.put(productId, cartMap.get(productId) + newQuantity);
+        } else {
+            cartMap.put(productId, newQuantity);
+        }
+
+        // המרה ל-JSON ושמירה ב-SharedPreferences
+        String updatedJson = gson.toJson(cartMap);
+        editor.putString("cartMap", updatedJson);
         editor.commit();
-    }
-
-    public List<String> getCartItems(){
-        sp = getSharedPreferences(fbAuthHelper.getCurrentUser().getUid(), 0);
-        String json = sp.getString("productList", ""); // מקבל את ה-JSON
-        Gson gson = new Gson();
-
-        // המרת ה-JSON חזרה לרשימה
-        Type type = new TypeToken<List<String>>(){}.getType();
-        List<String> ids = gson.fromJson(json, type);
-
-        return ids;
     }
 }

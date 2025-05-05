@@ -1,8 +1,9 @@
 package com.example.bagrutproject.model;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Product {
+public class Product implements Serializable {
 
     String image;
     String name;
@@ -96,8 +97,15 @@ public class Product {
     public void setCategory(String category) {
         this.category = category;
     }
-    public String toString(){
-        return "imageaddress: "+image+"/nname: "+name+"/n price: "+price+"/n details: "+details+"/n quantity: "+quantity+"/n category:"+category+"/n id:"+id;
+
+    public String toString() {
+        return "image address: " + image + "\n" +
+                "name: " + name + "\n" +
+                "price: " + price + "\n" +
+                "details: " + details + "\n" +
+                "quantity: " + quantity + "\n" +
+                "category: " + category + "\n" +
+                "id: " + id;
     }
 
     public void setId(String id) {
@@ -107,4 +115,6 @@ public class Product {
     public String getId() {
         return id;
     }
+
+    public void delete(){this.setQuantity(0);}
 }

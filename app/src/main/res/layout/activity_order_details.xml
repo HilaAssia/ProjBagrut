@@ -9,20 +9,35 @@
     tools:context=".views.ProductDetailsActivity">
 
     <TextView
+        android:id="@+id/tvEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:textSize="23sp"
+        android:text="email"
+        />
+
+    <TextView
         android:id="@+id/tvUid"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20dp"
-        android:text=" "
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:textSize="16sp"
+        android:text="user"
         />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvOrderProducts"
         android:layout_width="match_parent"
-        android:layout_height="577dp"
+        android:layout_height="540dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:background="@color/white" />
 
 
@@ -30,8 +45,10 @@
         android:id="@+id/tvOrderCost"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="30dp"
-        android:text=" "
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:textSize="30sp"
+        android:text="order cost"
         android:textStyle="bold"
         />
 
@@ -40,14 +57,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:gravity="top"
-        android:text=" " />
+        android:gravity="center_vertical"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="timestamp " />
 
     <Button
         android:id="@+id/btnAccept"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="accept"
+        android:textSize="19sp"
         android:backgroundTint="@color/light_blue"
         android:layout_gravity="center_horizontal"/>
 

@@ -88,6 +88,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="18sp"
                 android:text="Manager" />
 
             <Button
@@ -109,8 +110,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="8dp"
-        android:text="already registered? LogIn Now"
-        android:textSize="14sp"
+        android:text="already registered? Click here to LogIn Now"
+        android:textSize="18sp"
         android:textAlignment="center"
         android:id="@+id/loginText"
         android:textColor="@color/white"

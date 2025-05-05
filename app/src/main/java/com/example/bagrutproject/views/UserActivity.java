@@ -4,9 +4,13 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.SearchView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +24,9 @@ import com.example.bagrutproject.utils.FireStoreHelper;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
 
 public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBReply {
 
@@ -32,6 +39,8 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
     RecyclerView rvProducts;
     ProductsAdapter productsAdapter;
     SearchView searchBar;
+    Spinner orderBySpinner, catgorySpinner;
+    String orderBy, category;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -43,6 +52,42 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
         sp=getSharedPreferences("user cart",0);
         fbAuthHelper=new FBAuthHelper(this, this);
         fireStoreHelper=new FireStoreHelper(null);
+
+        orderBySpinner = findViewById(R.id.sOrderBy); // מוצא את הספינר מהעיצוב
+        setOrderBySpinner(); // טוען קטגוריות לספינר
+        orderBySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() { // מאזין לבחירת קטגוריה
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                String selectedItem = parentView.getItemAtPosition(position).toString(); // מקבל את הקטגוריה שנבחרה
+                Toast.makeText(UserActivity.this, "בחרת: " + selectedItem, Toast.LENGTH_SHORT).show(); // מציג הודעה
+                orderBy = selectedItem; // שומר את הקטגוריה שנבחרה
+                updateAdapter( orderBy, category);
+                productsAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // פעולה שלא מתבצעת כלום אם לא נבחר כלום
+            }
+        });
+
+        catgorySpinner = findViewById(R.id.sCategory); // מוצא את הספינר מהעיצוב
+        setCategories(); // טוען קטגוריות לספינר
+        catgorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() { // מאזין לבחירת קטגוריה
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                String selectedItem = parentView.getItemAtPosition(position).toString(); // מקבל את הקטגוריה שנבחרה
+                Toast.makeText(UserActivity.this, "בחרת: " + selectedItem, Toast.LENGTH_SHORT).show(); // מציג הודעה
+                category = selectedItem;
+                updateAdapter( orderBy,category); // שומר את הקטגוריה שנבחרה
+                productsAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // פעולה שלא מתבצעת כלום אם לא נבחר כלום
+            }
+        });
 
         cart = findViewById(R.id.cartButton);
         cart.setOnClickListener(new View.OnClickListener() {
@@ -63,24 +108,56 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
             }
         });
         rvProducts= findViewById(R.id.urvProducts);
-        setupRecyclerView(false);
+        setupRecyclerView();
 
         search();
     }
 
-    private void setupRecyclerView(boolean isSearching){
-        Query query = FireStoreHelper.getCollectionRefProduct().whereEqualTo("forSale",true).orderBy("name",
-                Query.Direction.DESCENDING);
+    private void setupRecyclerView(){
+        Query query = FireStoreHelper.getCollectionRefProduct().whereEqualTo("forSale",true)
+                .orderBy("name", Query.Direction.DESCENDING);
         FirestoreRecyclerOptions<Product> options=new FirestoreRecyclerOptions.Builder<Product>()
                 .setQuery(query, Product.class).build();
-        if (!isSearching) {
-            rvProducts.setLayoutManager(new LinearLayoutManager(this));
-            productsAdapter = new ProductsAdapter(options, this, true);
-            rvProducts.setAdapter(productsAdapter);
+        rvProducts.setLayoutManager(new LinearLayoutManager(UserActivity.this));
+        productsAdapter = new ProductsAdapter(options,UserActivity.this,true,fireStoreHelper);
+        rvProducts.setAdapter(productsAdapter);
+    }
+
+    private void updateAdapter(String orderBy, String category) {
+        Query query;
+
+        if (category != null && !category.equals("categories")) {
+            query = FireStoreHelper.getCollectionRefProduct()
+                    .whereEqualTo("forSale", true)
+                    .whereEqualTo("category", category);
+        } else {
+            query = FireStoreHelper.getCollectionRefProduct()
+                    .whereEqualTo("forSale", true);
         }
-        else
-            // עדכון ה-adapter עם אפשרויות חדשות
-            productsAdapter.updateOptions(options);
+
+        if (orderBy != null && !orderBy.equals("order by:")) {
+            switch (orderBy) {
+                case "highest price":
+                    query = query.orderBy("price", Query.Direction.DESCENDING);
+                    break;
+                case "lowest price":
+                    query = query.orderBy("price", Query.Direction.ASCENDING);
+                    break;
+                default:
+                    query = query.orderBy("name", Query.Direction.DESCENDING);
+            }
+        }
+        else {
+            query = query.orderBy("name", Query.Direction.DESCENDING);
+        }
+
+
+        FirestoreRecyclerOptions<Product> options = new FirestoreRecyclerOptions.Builder<Product>()
+                .setQuery(query, Product.class).build();
+
+        productsAdapter.stopListening();
+        productsAdapter.updateOptions(options);
+        productsAdapter.startListening();
     }
 
     @Override
@@ -171,7 +248,7 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
     private void performSearch(String query) {
         // אם אין חיפוש, הראה את כל המוצרים
         if (query.isEmpty()) {
-            setupRecyclerView(true);
+            updateAdapter( orderBy, category);
         }
 
         else {
@@ -191,5 +268,45 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
 
         // עדכן את המידע שהאדפטר מאזין לו
         productsAdapter.notifyDataSetChanged();
+    }
+
+    public void updateCatSpinner(ArrayList<String> items) { // עדכון הספינר עם רשימת קטגוריות
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, items);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        catgorySpinner.setAdapter(adapter); // מחבר את הרשימה לספינר
+    }
+
+    public void updateOrderBySpinner(ArrayList<String> items) { // עדכון הספינר עם רשימת קטגוריות
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, items);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        orderBySpinner.setAdapter(adapter); // מחבר את הרשימה לספינר
+    }
+
+    public void setCategories() { // שליפת קטגוריות מ-Firestore
+        ArrayList<String> categoriesList = new ArrayList<>();
+        categoriesList.add("categories"); // קטגוריה ברירת מחדל
+
+        FireStoreHelper.getCollectionRefCat().get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) { // עובר על כל מסמך
+                            String categoryName = document.getString("category"); // מביא את שם הקטגוריה
+                            categoriesList.add(categoryName); // מוסיף לרשימה
+                        }
+                        updateCatSpinner(categoriesList); // מעדכן את הספינר
+                    } else {
+                        Log.w("Firestore", "Error getting documents.", task.getException()); // מדווח על שגיאה
+                    }
+                });
+    }
+
+    public void setOrderBySpinner() { // שליפת קטגוריות מ-Firestore
+        ArrayList<String> orderByList = new ArrayList<>();
+        orderByList.add("order by:"); // קטגוריה ברירת מחדל
+
+        orderByList.add("highest price");
+        orderByList.add("lowest price");
+
+        updateOrderBySpinner(orderByList); // מעדכן את הספינר
     }
 }

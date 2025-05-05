@@ -29,6 +29,7 @@ public class FireStoreHelper {
         void getAllSuccess(ArrayList<Product> products);
         void getOneSuccess(Product product);
         void onProductsLoaded(ArrayList<Product> products);
+        void onDeleteSuccess();
     }
 
     public FireStoreHelper(FireStoreHelper.FBReply fbReply) {

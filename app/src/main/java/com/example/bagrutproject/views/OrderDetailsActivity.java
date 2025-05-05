@@ -26,12 +26,13 @@ import java.util.List;
 public class OrderDetailsActivity extends AppCompatActivity implements FireStoreHelper.FBReply {
 
     FireStoreHelper fireStoreHelper;
-    TextView tvUid, tvOrderCost, tvTimestamp;
+    TextView tvUid, tvEmail, tvOrderCost, tvTimestamp;
     RecyclerView rvOrderProducts;
     Button acceptBtn;
-    String docId,Uemail;
+    String docId, uEmail;
     ProductsAdapter productsAdapter;
     ArrayList<String> orderProductsIDs;
+    String orderString="";
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -40,6 +41,7 @@ public class OrderDetailsActivity extends AppCompatActivity implements FireStore
         setContentView(R.layout.activity_order_details);
 
         tvUid=findViewById(R.id.tvUid);
+        tvEmail=findViewById(R.id.tvEmail);
         tvOrderCost=findViewById(R.id.tvOrderCost);
         tvTimestamp=findViewById(R.id.tvTimestamp);
         rvOrderProducts=findViewById(R.id.rvOrderProducts);
@@ -48,10 +50,11 @@ public class OrderDetailsActivity extends AppCompatActivity implements FireStore
         docId = getIntent().getStringExtra("docId");
         if (docId != null && !docId.isEmpty()){
             tvUid.setText("user: "+getIntent().getStringExtra("uid"));
-            Uemail=getIntent().getStringExtra("email");
+            uEmail=getIntent().getStringExtra("email");
+            tvEmail.setText(uEmail);
             orderProductsIDs=getIntent().getStringArrayListExtra("products");
             setupRecyclerView(orderProductsIDs);
-            tvOrderCost.setText("total cost: "+getIntent().getStringExtra("cost"));
+            tvOrderCost.setText("total cost: "+getIntent().getStringExtra("cost")+"₪");
             tvTimestamp.setText("timestamp: "+getIntent().getStringExtra("timestamp"));
         }
 
@@ -60,9 +63,9 @@ public class OrderDetailsActivity extends AppCompatActivity implements FireStore
             @Override
             public void onClick(View v) {
                 sendEmail(orderProductsIDs);
-                Intent intent=new Intent(OrderDetailsActivity.this,OrdersFragment.class);
-                startActivity(intent);
-                finish();
+                //Intent intent=new Intent(OrderDetailsActivity.this,OrdersFragment.class);
+                //startActivity(intent);
+                //finish();
             }
         });
 
@@ -79,7 +82,7 @@ public class OrderDetailsActivity extends AppCompatActivity implements FireStore
                     .setQuery(query, Product.class).build();
 
             rvOrderProducts.setLayoutManager(new LinearLayoutManager(OrderDetailsActivity.this));
-            productsAdapter = new ProductsAdapter(options, OrderDetailsActivity.this,true);
+            productsAdapter = new ProductsAdapter(options, OrderDetailsActivity.this,true,fireStoreHelper);
             rvOrderProducts.setAdapter(productsAdapter);
             //productsAdapter.notifyDataSetChanged();
         }
@@ -110,38 +113,48 @@ public class OrderDetailsActivity extends AppCompatActivity implements FireStore
     }
 
     public void sendEmail(ArrayList<String> orderProductsIDs) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("message/rfc822"); // מסנן לאפליקציות מייל בלבד
-        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{Uemail.toString()}); // כתובת נמען
-        intent.putExtra(Intent.EXTRA_SUBJECT, "GearUp - order receipt"); // נושא
-        intent.putExtra(Intent.EXTRA_TEXT, "you ordered: "+ orderToString(orderProductsIDs,this)); // גוף ההודעה
-
-        try {
-            this.startActivity(Intent.createChooser(intent, "בחר אפליקציה לשליחת מייל"));
-        } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(this, "אין אפליקציות מייל מותקנות!", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public String orderToString(ArrayList<String> orderProductsIDs, FireStoreHelper.FBReply listener){
-        ArrayList<Product> order=new ArrayList<>();
         fireStoreHelper.getCollectionRefProduct().whereIn("id", orderProductsIDs)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
+                        ArrayList<Product> order = new ArrayList<>();
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            Product product = document.toObject(Product.class); // המרה למסד הנתונים
+                            Product product = document.toObject(Product.class);
                             order.add(product);
                         }
-                    }
-                    listener.onProductsLoaded(order); // במקרה של שגיאה מחזירים מערך ריק
-                });
 
-        String s="";
-        for (Product p:order){
-            s+= p.toString()+"./n ";
+                        String orderSummary = buildOrderString(order); // בניית מחרוזת מסודרת
+
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.setType("message/rfc822");
+                        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{uEmail.toString()});
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "GearUp - order receipt");
+                        intent.putExtra(Intent.EXTRA_TEXT, "You ordered:\n\n" + orderSummary);
+
+                        try {
+                            this.startActivity(Intent.createChooser(intent, "בחר אפליקציה לשליחת מייל"));
+                        } catch (android.content.ActivityNotFoundException ex) {
+                            Toast.makeText(this, "אין אפליקציות מייל מותקנות!", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(this, "שגיאה בטעינת המוצרים", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private String buildOrderString(ArrayList<Product> order) {
+        StringBuilder sb = new StringBuilder();
+        int total = 0;
+
+        for (Product product : order) {
+            sb.append("• ").append(product.getName())
+                    .append(" - ").append(product.getPrice())
+                    .append(" ₪\n");
+            total += Integer.parseInt(product.getPrice());
         }
-        return s;
+
+        sb.append("\nTotal: ").append(total).append(" ₪");
+        return sb.toString();
     }
 
     @Override
@@ -156,6 +169,15 @@ public class OrderDetailsActivity extends AppCompatActivity implements FireStore
 
     @Override
     public void onProductsLoaded(ArrayList<Product> products) {
+        for (Product p:products){
+            orderString+= p.toString()+"./n ";
+        }
         Toast.makeText(this, products.size()+" products loaded", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDeleteSuccess() {
+        recreate();
+        Toast.makeText(this, "Product deleted", Toast.LENGTH_SHORT).show();
     }
 }

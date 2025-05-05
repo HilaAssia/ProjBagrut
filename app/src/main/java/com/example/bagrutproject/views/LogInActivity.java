@@ -50,7 +50,7 @@ public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBR
 
                             if (querySnapshot != null && !querySnapshot.isEmpty()) {
                                 // User is a manager
-                                startActivity(new Intent(LogInActivity.this, HomeActivity.class));
+                                startActivity(new Intent(LogInActivity.this, ManagerActivity.class));
                                 finish();
                                 Log.d("Firestore", "מסמך נמצא עבור המשתמש");
                             } else {
@@ -133,7 +133,7 @@ public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBR
 
                         if (querySnapshot != null && !querySnapshot.isEmpty()) {
                             // User is a manager
-                            startActivity(new Intent(LogInActivity.this, HomeActivity.class));
+                            startActivity(new Intent(LogInActivity.this, ManagerActivity.class));
                             finish();
                             Log.d("Firestore", "מסמך נמצא עבור המשתמש");
                         } else {

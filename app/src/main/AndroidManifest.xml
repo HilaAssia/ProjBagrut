@@ -31,7 +31,7 @@
             android:name=".views.UserActivity"
             android:exported="false" />
         <activity
-            android:name=".views.HomeActivity"
+            android:name=".views.ManagerActivity"
             android:exported="false" />
         <activity
             android:name=".views.SignUpActivity"
