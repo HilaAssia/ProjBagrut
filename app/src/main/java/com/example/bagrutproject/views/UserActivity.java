@@ -51,7 +51,7 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
         searchBar=findViewById(R.id.search_bar);
         sp=getSharedPreferences("user cart",0);
         fbAuthHelper=new FBAuthHelper(this, this);
-        fireStoreHelper=new FireStoreHelper(null);
+        fireStoreHelper=new FireStoreHelper();
 
         orderBySpinner = findViewById(R.id.sOrderBy); // מוצא את הספינר מהעיצוב
         setOrderBySpinner(); // טוען קטגוריות לספינר

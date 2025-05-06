@@ -24,6 +24,7 @@ public class FireStoreHelper {
     private static CollectionReference collectionRefManager = db.collection("managers");
     private static CollectionReference collectionRefOrder = db.collection("orders");
     private FireStoreHelper.FBReply fbReply;
+    private FireStoreHelper.FBProductStat fbProductStat;
 
     public interface FBReply {
         void getAllSuccess(ArrayList<Product> products);
@@ -32,8 +33,19 @@ public class FireStoreHelper {
         void onDeleteSuccess();
     }
 
+    public interface FBProductStat{
+        void onAddSuccesses(String id, Product product);
+    }
+
+    public FireStoreHelper() {
+    }
+
     public FireStoreHelper(FireStoreHelper.FBReply fbReply) {
         this.fbReply = fbReply;
+    }
+
+    public FireStoreHelper(FireStoreHelper.FBProductStat fbProductStat) {
+        this.fbProductStat = fbProductStat;
     }
 
     public void add(Order order, Context context) {
@@ -64,6 +76,7 @@ public class FireStoreHelper {
     public void add(Product product) {
         collectionRefProduct.add(product).addOnSuccessListener(documentReference -> {
             Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+            fbProductStat.onAddSuccesses(documentReference.getId(), product);
         }).addOnFailureListener(e -> {
             Log.w(TAG, "Error adding document", e);
         });

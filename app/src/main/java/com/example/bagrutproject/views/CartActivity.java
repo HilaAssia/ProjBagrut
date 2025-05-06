@@ -149,14 +149,16 @@ public class CartActivity extends AppCompatActivity implements FireStoreHelper.F
 
     // עדכון כמויות מוצרים במלאי אחרי רכישה
     public boolean updateInventoryQuantity(ArrayList<Product> order) {
+        Product product;
         for (Product p : order) { // לולאה שעוברת על כל המוצרים בהזמנה
+            product =new Product(p);
             if (productInventoryQuantity.get(p.getId()) - p.getQuantity() < 0) { // אם אין מספיק מלאי
                 Toast.makeText(this, p.getName() + ": is out of stock!!!", Toast.LENGTH_LONG).show(); // הודעת חוסר מלאי
                 return false;
             }
             else {// אם יש מספיק מלאי
-                p.setQuantity(productInventoryQuantity.get(p.getId()) - p.getQuantity()); // הורדת הכמות במלאי
-                fireStoreHelper.update(p.getId(), p); // עדכון המוצר במסד הנתונים
+                product.setQuantity(productInventoryQuantity.get(p.getId()) - p.getQuantity()); // הורדת הכמות במלאי
+                fireStoreHelper.update(product.getId(), product); // עדכון המוצר במסד הנתונים
                 Toast.makeText(this, p.getQuantity() + " items are in stock", Toast.LENGTH_LONG).show(); // הצגת הכמות החדשה
             }
         }

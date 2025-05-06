@@ -63,7 +63,7 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
                 intent.putExtra("quantity", product.getQuantity());
                 intent.putExtra("forSale", product.getForSale());
                 intent.putExtra("category", product.getCategory());
-                intent.putExtra("id",product.getId());
+                intent.putExtra("id",this.getSnapshots().getSnapshot(position).getId());
 
                 String docId=this.getSnapshots().getSnapshot(position).getId();
                 intent.putExtra("docId", docId);
@@ -84,7 +84,7 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
                 intent.putExtra("price", product.getPrice());
                 intent.putExtra("details", product.getDetails());
                 intent.putExtra("category", product.getCategory());
-                intent.putExtra("id",product.getId());
+                intent.putExtra("id",this.getSnapshots().getSnapshot(position).getId());
 
                 String docId=this.getSnapshots().getSnapshot(position).getId();
                 intent.putExtra("docId", docId);

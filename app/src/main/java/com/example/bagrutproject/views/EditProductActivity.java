@@ -31,7 +31,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 
-public class EditProductActivity extends AppCompatActivity {
+public class EditProductActivity extends AppCompatActivity implements FireStoreHelper.FBProductStat {
 
     private ActivityResultLauncher<Void> mGetThumb; // מפעיל מצלמה ולקיחת תמונה מוקטן
     private ActivityResultLauncher<String> mGetContent; // מפעיל בחירת תמונה מהגלריה
@@ -76,7 +76,7 @@ public class EditProductActivity extends AppCompatActivity {
         registerCameraLauncher(); // רושם את הפעולה לצילום תמונה
         registerForContentLauncher(); // רושם את הפעולה לבחירת תמונה מהגלריה
 
-        fireStoreHelper = new FireStoreHelper(null); // יוצר עוזר למסד הנתונים
+        fireStoreHelper = new FireStoreHelper(this); // יוצר עוזר למסד הנתונים
 
         captureImageBtn = findViewById(R.id.btnCaptureImage); // מוצא את כפתור הצילום
         captureImageBtn.setOnClickListener(new View.OnClickListener() { // מאזין ללחיצה על צילום
@@ -151,7 +151,13 @@ public class EditProductActivity extends AppCompatActivity {
             etDetails.setError("please enter some content");
             isValid = false;
         }
-        if (Integer.parseInt(etQuantity.getText().toString()) <= 0) {
+        if (!etQuantity.getText().toString().isEmpty()){
+            if (Integer.parseInt(etQuantity.getText().toString()) <= 0) {
+                etQuantity.setError("quantity has to be more than 0!!!");
+                isValid = false;
+            }
+        }
+        else {
             etQuantity.setError("please enter some content");
             isValid = false;
         }
@@ -248,5 +254,11 @@ public class EditProductActivity extends AppCompatActivity {
                         Log.w("Firestore", "Error getting documents.", task.getException()); // מדווח על שגיאה
                     }
                 });
+    }
+
+    @Override
+    public void onAddSuccesses(String docId, Product product) {
+        product.setId(docId);
+        fireStoreHelper.update(docId, product);
     }
 }

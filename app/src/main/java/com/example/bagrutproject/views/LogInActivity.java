@@ -41,7 +41,7 @@ public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBR
 
         // If user already logged in, check if they're a manager or user
         if (user != null) {
-            fireStoreHelper = new FireStoreHelper(null);
+            fireStoreHelper = new FireStoreHelper();
             fireStoreHelper.getCollectionRefManager()
                     .whereEqualTo("uID", user.getUid()).get()
                     .addOnCompleteListener(task -> {

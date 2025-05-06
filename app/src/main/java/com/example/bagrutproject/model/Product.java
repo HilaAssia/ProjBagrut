@@ -17,10 +17,19 @@ public class Product implements Serializable {
     public Product() {
         
     }
+    public Product(Product p) {
+        this.image=p.getImage();
+        this.name=p.getName();
+        this.price=p.getPrice();
+        this.category=p.getCategory();
+        this.details=p.getDetails();
+        this.quantity=p.getQuantity();
+        this.forSale= p.forSale;
+        this.id=p.getId();
+    }
     public Product(String name, String price, String details, int quantity, boolean forSale) {
         this.name=name;
         this.price=price;
-        //this.category=category;
         this.details=details;
         this.quantity=quantity;
         this.forSale=forSale;
