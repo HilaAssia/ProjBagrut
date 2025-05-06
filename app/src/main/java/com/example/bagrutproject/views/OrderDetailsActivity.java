@@ -63,9 +63,11 @@ public class OrderDetailsActivity extends AppCompatActivity implements FireStore
             @Override
             public void onClick(View v) {
                 sendEmail(orderProductsIDs);
-                //Intent intent=new Intent(OrderDetailsActivity.this,OrdersFragment.class);
-                //startActivity(intent);
-                //finish();
+                fireStoreHelper.deleteOrder(docId);
+                Intent intent = new Intent(OrderDetailsActivity.this, ManagerActivity.class);
+                intent.putExtra("fragmentToLoad", "orders"); // נעביר מידע לאיזה Fragment לעבור
+                startActivity(intent);
+                finish();
             }
         });
 

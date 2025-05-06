@@ -31,7 +31,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 
-public class EditProductActivity extends AppCompatActivity implements FireStoreHelper.FBProductStat {
+public class EditProductActivity extends AppCompatActivity implements FireStoreHelper.FBProductStat, FireStoreHelper.FBReply {
 
     private ActivityResultLauncher<Void> mGetThumb; // מפעיל מצלמה ולקיחת תמונה מוקטן
     private ActivityResultLauncher<String> mGetContent; // מפעיל בחירת תמונה מהגלריה
@@ -42,15 +42,27 @@ public class EditProductActivity extends AppCompatActivity implements FireStoreH
     EditText etName, etPrice, etDetails, etQuantity; // שדות קלט לשם, מחיר, פרטים וכמות
     Boolean isEditMode = false; // משתנה שבודק אם אנחנו במצב עריכה
     Button saveBtn, deleteBtn, captureImageBtn, selectImageBtn; // כפתורים לשמירה, מחיקה, צילום ובחירת תמונה
-    String docId, category; // מזהה המוצר והקטגוריה הנבחרת
+    String docId, category, imageString; // מזהה המוצר והקטגוריה הנבחרת
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_product); // מחבר את העיצוב של הפעילות
 
+        // אתחול רכיבים גרפיים מהמסך
+        ivImage = findViewById(R.id.imageView);
+        etName = findViewById(R.id.etName);
+        etPrice = findViewById(R.id.etPrice);
+        etDetails = findViewById(R.id.etDetails);
+        etQuantity = findViewById(R.id.etQuantity);
+        forSale = findViewById(R.id.switchForSale);
+
+        registerCameraLauncher(); // רושם את הפעולה לצילום תמונה
+        registerForContentLauncher(); // רושם את הפעולה לבחירת תמונה מהגלריה
+
+        fireStoreHelper = new FireStoreHelper(this, this); // יוצר עוזר למסד הנתונים
+
         spinner = findViewById(R.id.spinner); // מוצא את הספינר מהעיצוב
-        setCategories(); // טוען קטגוריות לספינר
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() { // מאזין לבחירת קטגוריה
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
@@ -65,18 +77,23 @@ public class EditProductActivity extends AppCompatActivity implements FireStoreH
             }
         });
 
-        // אתחול רכיבים גרפיים מהמסך
-        ivImage = findViewById(R.id.imageView);
-        etName = findViewById(R.id.etName);
-        etPrice = findViewById(R.id.etPrice);
-        etDetails = findViewById(R.id.etDetails);
-        etQuantity = findViewById(R.id.etQuantity);
-        forSale = findViewById(R.id.switchForSale);
+        // בודק אם קיבלנו מזהה מוצר לעריכה
+        docId = getIntent().getStringExtra("docId");
+        if (docId != null && !docId.isEmpty()) {
+            isEditMode = true; // מפעיל מצב עריכה
 
-        registerCameraLauncher(); // רושם את הפעולה לצילום תמונה
-        registerForContentLauncher(); // רושם את הפעולה לבחירת תמונה מהגלריה
-
-        fireStoreHelper = new FireStoreHelper(this); // יוצר עוזר למסד הנתונים
+            //fireStoreHelper.getOne(docId);
+            /*forSale.setChecked(getIntent().getBooleanExtra("forSale", false));
+            etName.setText(getIntent().getStringExtra("name"));
+            etPrice.setText(getIntent().getStringExtra("price"));
+            etDetails.setText(getIntent().getStringExtra("details"));
+            etQuantity.setText(Integer.toString(getIntent().getIntExtra("quantity", 0)));
+            category = getIntent().getStringExtra("category");
+            findViewById(R.id.btndelete).setVisibility(View.VISIBLE); // מציג כפתור מחיקה*/
+            fireStoreHelper.getOne(docId);
+        }
+        else
+            setCategories(); // טוען קטגוריות לספינר
 
         captureImageBtn = findViewById(R.id.btnCaptureImage); // מוצא את כפתור הצילום
         captureImageBtn.setOnClickListener(new View.OnClickListener() { // מאזין ללחיצה על צילום
@@ -107,6 +124,7 @@ public class EditProductActivity extends AppCompatActivity implements FireStoreH
                             forSale.isChecked(), category);
                     Intent intent = new Intent(EditProductActivity.this, ManagerActivity.class); // עובר חזרה למסך הניהול
                     startActivity(intent);
+                    finish();
                 }
             }
         });
@@ -120,21 +138,6 @@ public class EditProductActivity extends AppCompatActivity implements FireStoreH
                 startActivity(intent);
             }
         });
-
-        // בודק אם קיבלנו מזהה מוצר לעריכה
-        docId = getIntent().getStringExtra("docId");
-        if (docId != null && !docId.isEmpty()) {
-            isEditMode = true; // מפעיל מצב עריכה
-            // ממלא את השדות הקיימים במידע שהגיע
-            ivImage.setImageBitmap(ImageUtils.convertStringToBitmap(getIntent().getStringExtra("image")));
-            forSale.setChecked(getIntent().getBooleanExtra("forSale", false));
-            etName.setText(getIntent().getStringExtra("name"));
-            etPrice.setText(getIntent().getStringExtra("price"));
-            etDetails.setText(getIntent().getStringExtra("details"));
-            etQuantity.setText(Integer.toString(getIntent().getIntExtra("quantity", 0)));
-            category = getIntent().getStringExtra("category");
-            findViewById(R.id.btndelete).setVisibility(View.VISIBLE); // מציג כפתור מחיקה
-        }
     }
 
     private boolean validateInput() { // בדיקה אם השדות מולאו בצורה תקינה
@@ -194,14 +197,15 @@ public class EditProductActivity extends AppCompatActivity implements FireStoreH
 
     private void saveProduct(Bitmap bitmap, String name, String price, String details, int quantity, boolean forSale, String category) { // שמירה של מוצר
         Product product = new Product(ImageUtils.convertBitmapToString(bitmap), name, price, details, quantity, forSale, category); // יוצר אובייקט מוצר
-        if (isEditMode) // אם במצב עריכה
+        if (isEditMode) { // אם במצב עריכה
+            product.setId(docId);
             fireStoreHelper.update(docId, product); // מעדכן מוצר קיים
-        else
+        }else
             fireStoreHelper.add(product); // מוסיף מוצר חדש
     }
 
     private void deleteProduct() { // מחיקת מוצר
-        fireStoreHelper.delete(docId); // מוחק לפי מזהה
+        fireStoreHelper.deleteProduct(docId); // מוחק לפי מזהה
     }
 
     private void registerCameraLauncher() { // רישום פעולת צילום
@@ -217,9 +221,16 @@ public class EditProductActivity extends AppCompatActivity implements FireStoreH
         mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri); // מקבל תמונה מהגלריה
-                ivImage.setImageBitmap(bitmap); // מציג את התמונה
+                String imageStr = ImageUtils.convertBitmapToString(bitmap); // ממיר את התמונה למחרוזת
+                if (imageStr.getBytes().length > 1048576) { // אם גודל המחרוזת גדול מ־1MB
+                    Toast.makeText(this, "התמונה כבדה מדי, אנא בחר תמונה אחרת", Toast.LENGTH_LONG).show();
+                } else {
+                    ivImage.setImageBitmap(bitmap); // מציג את התמונה
+                    // כאן תוכל גם לשמור אותה אם צריך
+                }
             } catch (Exception e) {
                 e.printStackTrace();
+                Toast.makeText(this, "שגיאה בטעינת התמונה", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -260,5 +271,35 @@ public class EditProductActivity extends AppCompatActivity implements FireStoreH
     public void onAddSuccesses(String docId, Product product) {
         product.setId(docId);
         fireStoreHelper.update(docId, product);
+    }
+
+    @Override
+    public void getAllSuccess(ArrayList<Product> products) {
+
+    }
+
+    @Override
+    public void getOneSuccess(Product product) {
+        // ממלא את השדות הקיימים במידע שהגיע
+        ivImage.setImageBitmap(ImageUtils.convertStringToBitmap(product.getImage()));
+        forSale.setChecked(product.getForSale());
+        etName.setText(product.getName());
+        etPrice.setText(product.getPrice());
+        etDetails.setText(product.getDetails());
+        etQuantity.setText(String.valueOf(product.getQuantity()));
+        category = product.getCategory();
+        setCategories(); // טוען קטגוריות לספינר
+
+        findViewById(R.id.btndelete).setVisibility(View.VISIBLE); // מציג כפתור מחיקה
+    }
+
+    @Override
+    public void onProductsLoaded(ArrayList<Product> products) {
+
+    }
+
+    @Override
+    public void onDeleteSuccess() {
+
     }
 }

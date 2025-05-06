@@ -56,14 +56,14 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
             });
             holder.itemView.setOnClickListener(v-> {
                 Intent intent = new Intent(context, EditProductActivity.class);
-                intent.putExtra("image", product.getImage());
+                /*intent.putExtra("image", product.getImage());
                 intent.putExtra("name", product.getName());
                 intent.putExtra("price", product.getPrice());
                 intent.putExtra("details", product.getDetails());
                 intent.putExtra("quantity", product.getQuantity());
                 intent.putExtra("forSale", product.getForSale());
                 intent.putExtra("category", product.getCategory());
-                intent.putExtra("id",this.getSnapshots().getSnapshot(position).getId());
+                intent.putExtra("id",this.getSnapshots().getSnapshot(position).getId());*/
 
                 String docId=this.getSnapshots().getSnapshot(position).getId();
                 intent.putExtra("docId", docId);
@@ -79,12 +79,12 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
 
             holder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(context, ProductDetailsActivity.class);
-                intent.putExtra("image", product.getImage());
+                /*intent.putExtra("image", product.getImage());
                 intent.putExtra("name", product.getName());
                 intent.putExtra("price", product.getPrice());
                 intent.putExtra("details", product.getDetails());
                 intent.putExtra("category", product.getCategory());
-                intent.putExtra("id",this.getSnapshots().getSnapshot(position).getId());
+                intent.putExtra("id",this.getSnapshots().getSnapshot(position).getId());*/
 
                 String docId=this.getSnapshots().getSnapshot(position).getId();
                 intent.putExtra("docId", docId);
@@ -137,7 +137,7 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
     }
 
     private void deleteProduct(Product product) {
-        fireStoreHelper.delete(product.getId());
+        fireStoreHelper.deleteProduct(product.getId());
     }
 
 }

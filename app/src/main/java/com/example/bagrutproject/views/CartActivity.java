@@ -1,9 +1,13 @@
 package com.example.bagrutproject.views;
 
+import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,11 +38,13 @@ public class CartActivity extends AppCompatActivity implements FireStoreHelper.F
     CartAdapter cartAdapter; // מתאם להצגת מוצרים בעגלה
     RecyclerView rvProducts; // רכיב להצגת המוצרים
     TextView tvTotalPrice; // תצוגה של המחיר הכולל
-    Button buyBtn; // כפתור רכישה
+    Button buyBtn, keepShopingBtn; // כפתור רכישה
     ArrayList<Product> order; // רשימת המוצרים בעגלה
     double totalPrice; // מחיר כולל של כל המוצרים
     static HashMap<String,Integer> productInventoryQuantity;
+    private Dialog cartDialog;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) { // פונקציה שמופעלת כשהמסך נוצר
         super.onCreate(savedInstanceState); // קריאה לפונקציית העל
@@ -48,7 +54,8 @@ public class CartActivity extends AppCompatActivity implements FireStoreHelper.F
         fireStoreHelper = new FireStoreHelper(this);
         rvProducts = findViewById(R.id.crvProducts);
         tvTotalPrice = findViewById(R.id.tvTotalPrice);
-        buyBtn = findViewById(R.id.button);
+        buyBtn = findViewById(R.id.btnBuy);
+        keepShopingBtn = findViewById(R.id.btnReturnToCart);
         order = new ArrayList<>();
         productInventoryQuantity=new HashMap<>();
 
@@ -73,15 +80,32 @@ public class CartActivity extends AppCompatActivity implements FireStoreHelper.F
                 if (updateInventoryQuantity(newOrder.getProducts())) { // עדכון כמויות מלאי
                     fireStoreHelper.add(newOrder, CartActivity.this); // הוספת ההזמנה למסד הנתונים
                     Toast.makeText(CartActivity.this, "You will get an email when your order is ready :) ", Toast.LENGTH_SHORT).show(); // הצגת הודעה למשתמש
+                    clearCart();
+                    recreate();
                 }
                 else
                     Toast.makeText(CartActivity.this, "one or more of your order is out of stock!", Toast.LENGTH_SHORT).show();
             }
         });
 
+        keepShopingBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CartActivity.this, UserActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         // הגדרת ה-RecyclerView להצגת מוצרים
         setupRecyclerView(getCartItems());
+    }
+
+    public void clearCart() {
+        SharedPreferences sp = getSharedPreferences(fireStoreHelper.getCurrentUser().getEmail(), 0);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.remove("cartMap"); // מוחק את מפת העגלה
+        editor.apply(); // שומר את השינויים
     }
 
     // שליפת רשימת מזהים של מוצרים מהזיכרון המקומי
@@ -179,6 +203,10 @@ public class CartActivity extends AppCompatActivity implements FireStoreHelper.F
             rvProducts.setLayoutManager(new LinearLayoutManager(CartActivity.this)); // קביעת סידור ליניארי של המוצרים
             cartAdapter = new CartAdapter(options, CartActivity.this, fireStoreHelper.getCurrentUser()); // יצירת מתאם לרשימה
             rvProducts.setAdapter(cartAdapter); // חיבור המתאם ל-RecyclerView
+
+            cartAdapter.setOnProductDeleteRequestListener(productId -> {
+                showDeleteDialog(productId);
+            });
         } else {
             Log.d("CartActivity", "No products to display."); // הודעת דיבוג שאין מוצרים
         }
@@ -196,6 +224,9 @@ public class CartActivity extends AppCompatActivity implements FireStoreHelper.F
         super.onStop();
         if (cartAdapter != null)
             cartAdapter.stopListening(); // עצירת האזנה לשינויים
+        if (cartDialog != null && cartDialog.isShowing()) {
+            cartDialog.dismiss();
+        }
     }
 
     @Override
@@ -221,7 +252,7 @@ public class CartActivity extends AppCompatActivity implements FireStoreHelper.F
             Toast.makeText(this, "Cart is empty", Toast.LENGTH_SHORT).show(); // הודעה על עגלה ריקה
         } else {
             setTotalPrice(order); // חישוב ואיתחול מחיר כולל
-            Toast.makeText(this, products.size() + " products loaded", Toast.LENGTH_SHORT).show(); // הודעה על מספר מוצרים שהועמסו
+            //Toast.makeText(this, products.size() + " products loaded", Toast.LENGTH_SHORT).show(); // הודעה על מספר מוצרים שהועמסו
         }
     }
 
@@ -232,5 +263,34 @@ public class CartActivity extends AppCompatActivity implements FireStoreHelper.F
 
     public static int getProductInventoryQuantity(String id){
         return productInventoryQuantity.get(id);
+    }
+
+
+
+    private void showDeleteDialog(String productId) {
+        cartDialog = new Dialog(this);
+        cartDialog.setContentView(R.layout.delete_dialog);
+        cartDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        cartDialog.setCancelable(false);
+
+        Button btnDelete = cartDialog.findViewById(R.id.btnDELETE);
+        Button btnCancel = cartDialog.findViewById(R.id.btnCancel);
+
+        btnDelete.setOnClickListener(v -> {
+            cartAdapter.deleteProduct(productId);
+            cartDialog.dismiss();
+        });
+
+        btnCancel.setOnClickListener(v -> cartDialog.dismiss());
+
+        cartDialog.show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (cartDialog != null && cartDialog.isShowing()) {
+            cartDialog.dismiss();
+        }
+        super.onDestroy();
     }
 }

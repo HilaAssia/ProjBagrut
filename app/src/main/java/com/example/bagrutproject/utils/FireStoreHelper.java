@@ -48,6 +48,11 @@ public class FireStoreHelper {
         this.fbProductStat = fbProductStat;
     }
 
+    public FireStoreHelper(FireStoreHelper.FBReply fbReply,FireStoreHelper.FBProductStat fbProductStat) {
+        this.fbReply = fbReply;
+        this.fbProductStat = fbProductStat;
+    }
+
     public void add(Order order, Context context) {
         collectionRefOrder.add(order).addOnSuccessListener(documentReference -> {
             Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
@@ -94,8 +99,15 @@ public class FireStoreHelper {
             Log.w(TAG, "Error updating document", e);
         });
     }
-    public void delete(String id) {
+    public void deleteProduct(String id) {
         collectionRefProduct.document(id).delete().addOnSuccessListener(aVoid -> {
+            Log.d(TAG, "DocumentSnapshot deleted with ID: " + id);
+        }).addOnFailureListener(e -> {
+            Log.w(TAG, "Error deleting document", e);
+        });
+    }
+    public void deleteOrder(String id) {
+        collectionRefOrder.document(id).delete().addOnSuccessListener(aVoid -> {
             Log.d(TAG, "DocumentSnapshot deleted with ID: " + id);
         }).addOnFailureListener(e -> {
             Log.w(TAG, "Error deleting document", e);

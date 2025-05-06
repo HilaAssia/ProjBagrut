@@ -32,12 +32,21 @@ public class CartAdapter extends FirestoreRecyclerAdapter<Product, CartAdapter.C
 
     private Context context; // משתנה לשמירת הקשר למסך הנוכחי
     private FirebaseUser user;
+    private OnProductDeleteRequestListener deleteListener;
 
     // בנאי של המתאם, מקבל את האפשרויות לטעינה ואת הקונטקסט
     public CartAdapter(FirestoreRecyclerOptions<Product> options, Context context, FirebaseUser user) {
         super(options); // קריאה לבנאי של FirestoreRecyclerAdapter
         this.context = context; // שמירת הקשר שהתקבל
         this.user = user;
+    }
+
+    public interface OnProductDeleteRequestListener {
+        void onDeleteRequest(String productId);
+    }
+
+    public void setOnProductDeleteRequestListener(OnProductDeleteRequestListener listener) {
+        this.deleteListener = listener;
     }
 
     // פונקציה שמקשרת בין אובייקט מוצר לבין תצוגת האייטם בעגלה
@@ -70,7 +79,6 @@ public class CartAdapter extends FirestoreRecyclerAdapter<Product, CartAdapter.C
         holder.ibDecrease.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO הוספה של 1 לכמות
                 decreaseQuantity(product.getId());
                 // עדכון תצוגה
                 int quantity = getProductQuantityFromCart(product.getId());
@@ -81,8 +89,9 @@ public class CartAdapter extends FirestoreRecyclerAdapter<Product, CartAdapter.C
         holder.ibDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO הוספה של 1 לכמות
-                deleteProduct(product.getId());
+                if (deleteListener != null) {
+                    deleteListener.onDeleteRequest(product.getId());
+                }
                 // עדכון תצוגה
                 int quantity = getProductQuantityFromCart(product.getId());
                 holder.tvQuantity.setText(String.valueOf(quantity));
@@ -180,6 +189,11 @@ public class CartAdapter extends FirestoreRecyclerAdapter<Product, CartAdapter.C
         String updatedJson = gson.toJson(cartMap);
         editor.putString("cartMap", updatedJson);
         editor.apply();
+
+        // ריסטארט של CartActivity
+        if (context instanceof Activity) {
+            ((Activity) context).recreate();
+        }
     }
 
     public void decreaseQuantity(String productId){
@@ -196,19 +210,21 @@ public class CartAdapter extends FirestoreRecyclerAdapter<Product, CartAdapter.C
             if (currentQuantity > 1) {
                 cartMap.put(productId, currentQuantity - 1);
             } else {
-                cartMap.remove(productId); // הסרה אם הכמות היא 1
+                if (deleteListener != null) {
+                    deleteListener.onDeleteRequest(productId);
+                    return;
+                } // הסרה אם הכמות היא 1
             }
         }
 
-        else
+        else {
             cartMap = new HashMap<>();
+        }
 
         // שמירה
         String updatedJson = gson.toJson(cartMap);
         editor.putString("cartMap", updatedJson);
         editor.apply();
-
-        this.notifyDataSetChanged(); // רענון התצוגה
 
         // ריסטארט של CartActivity
         if (context instanceof Activity) {
