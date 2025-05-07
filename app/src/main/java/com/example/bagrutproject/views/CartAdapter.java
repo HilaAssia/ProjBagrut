@@ -63,7 +63,8 @@ public class CartAdapter extends FirestoreRecyclerAdapter<Product, CartAdapter.C
         holder.tvPrice.setText(product.getPrice() + "₪");
 
         // (שורות שמורות במידה ורוצים להציג פרטים נוספים)
-        // holder.tvDetails.setText(product.getDetails());
+        holder.tvDetails.setText(product.getDetails());
+
         int quantity = getProductQuantityFromCart(product.getId());
         holder.tvQuantity.setText(String.valueOf(quantity));
         holder.ibIncrease.setOnClickListener(new View.OnClickListener() {
@@ -129,7 +130,7 @@ public class CartAdapter extends FirestoreRecyclerAdapter<Product, CartAdapter.C
 
     // מחלקה פנימית שמייצגת את תצוגת פריט אחד בעגלה
     public class CartViewHolder extends RecyclerView.ViewHolder {
-        TextView tvName, tvPrice, tvQuantity; // טקסט להצגת שם ומחיר המוצר
+        TextView tvName, tvPrice, tvQuantity, tvDetails; // טקסט להצגת שם ומחיר המוצר
         ImageView ivImage; // תצוגת תמונה של המוצר
         ImageButton ibIncrease, ibDecrease, ibDelete; // כפתורי מחיקה, הוספה והפחתה
 
@@ -140,7 +141,7 @@ public class CartAdapter extends FirestoreRecyclerAdapter<Product, CartAdapter.C
             ivImage = itemView.findViewById(R.id.imgIcon);
             tvName = itemView.findViewById(R.id.tvName);
             tvPrice = itemView.findViewById(R.id.tvPrice);
-            // tvDetails = itemView.findViewById(R.id.tvDetails); // (שמורים לפרטים נוספים)
+            tvDetails = itemView.findViewById(R.id.tvDetails); // (שמורים לפרטים נוספים)
             tvQuantity = itemView.findViewById(R.id.tvQuantity);
 
             ibIncrease = itemView.findViewById(R.id.btnIncrease);

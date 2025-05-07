@@ -79,7 +79,7 @@ public class CartActivity extends AppCompatActivity implements FireStoreHelper.F
                 );
                 if (updateInventoryQuantity(newOrder.getProducts())) { // עדכון כמויות מלאי
                     fireStoreHelper.add(newOrder, CartActivity.this); // הוספת ההזמנה למסד הנתונים
-                    Toast.makeText(CartActivity.this, "You will get an email when your order is ready :) ", Toast.LENGTH_SHORT).show(); // הצגת הודעה למשתמש
+                    //Toast.makeText(CartActivity.this, "You will get an email when your order is ready :) ", Toast.LENGTH_SHORT).show(); // הצגת הודעה למשתמש
                     clearCart();
                     recreate();
                 }
@@ -183,7 +183,7 @@ public class CartActivity extends AppCompatActivity implements FireStoreHelper.F
             else {// אם יש מספיק מלאי
                 product.setQuantity(productInventoryQuantity.get(p.getId()) - p.getQuantity()); // הורדת הכמות במלאי
                 fireStoreHelper.update(product.getId(), product); // עדכון המוצר במסד הנתונים
-                Toast.makeText(this, p.getQuantity() + " items are in stock", Toast.LENGTH_LONG).show(); // הצגת הכמות החדשה
+                //Toast.makeText(this, p.getQuantity() + " items are in stock", Toast.LENGTH_LONG).show(); // הצגת הכמות החדשה
             }
         }
         return true;

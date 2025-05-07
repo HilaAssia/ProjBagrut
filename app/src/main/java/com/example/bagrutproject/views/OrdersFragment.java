@@ -4,16 +4,24 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bagrutproject.R;
+import com.example.bagrutproject.model.LogoutListener;
 import com.example.bagrutproject.model.Order;
 import com.example.bagrutproject.utils.FireStoreHelper;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.Query;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,6 +41,7 @@ public class OrdersFragment extends Fragment {
 
     OrdersAdapter ordersAdapter;
     RecyclerView rvOrders;
+    Spinner spinner;
 
     public OrdersFragment() {
         // Required empty public constructor
@@ -71,6 +80,36 @@ public class OrdersFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_orders, container, false);
         rvOrders= (RecyclerView) view.findViewById(R.id.rvOrders);
+        spinner = (Spinner) view.findViewById(R.id.topNav); // מוצא את הספינר מהעיצוב
+        setOptions();
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() { // מאזין לבחירת קטגוריה
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                String selectedItem = parentView.getItemAtPosition(position).toString(); // מקבל את הקטגוריה שנבחרה
+                Toast.makeText(OrdersFragment.this.getContext(), "בחרת: " + selectedItem, Toast.LENGTH_SHORT).show(); // מציג הודעה
+                if (selectedItem.equals("logout")) {
+                    new AlertDialog.Builder(requireContext())
+                            .setTitle("logout")
+                            .setMessage("are you sure you want to logout?")
+                            .setPositiveButton("yes", (dialog, which) -> {
+                                if (getActivity() instanceof LogoutListener) {
+                                    ((LogoutListener) getActivity()).logout();
+                                }
+                            })
+                            .setNegativeButton("cancel", (dialog, which) -> {
+                                dialog.dismiss(); // פשוט סוגר את הדיאלוג
+                            })
+                            .show();
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // פעולה שלא מתבצעת כלום אם לא נבחר כלום
+            }
+        });
+
         // Inflate the layout for this fragment
         setupRecyclerView();
 
@@ -104,4 +143,18 @@ public class OrdersFragment extends Fragment {
         ordersAdapter.notifyDataSetChanged();
     }
 
+    public void updateSpinner(ArrayList<String> items) { // עדכון הספינר עם רשימת קטגוריות
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_spinner_item, items);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter); // מחבר את הרשימה לספינר
+    }
+
+    public void setOptions() { // שליפת קטגוריות מ-Firestore
+        ArrayList<String> categoriesList = new ArrayList<>();
+        categoriesList.add(""); // קטגוריה ברירת מחדל
+
+        categoriesList.add("logout");
+
+        updateSpinner(categoriesList);
+    }
 }

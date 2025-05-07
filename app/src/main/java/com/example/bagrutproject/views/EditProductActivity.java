@@ -167,7 +167,7 @@ public class EditProductActivity extends AppCompatActivity implements FireStoreH
         if (category.equals("category")) { // אם לא נבחרה קטגוריה
             // מציג דיאלוג ליצירת קטגוריה חדשה
             Dialog dialog = new Dialog(EditProductActivity.this);
-            dialog.setContentView(R.layout.dialog);
+            dialog.setContentView(R.layout.add_cat_dialog);
             dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             dialog.setCancelable(false);
             EditText etCategory = dialog.findViewById(R.id.etCategory);
@@ -176,7 +176,9 @@ public class EditProductActivity extends AppCompatActivity implements FireStoreH
                 @Override
                 public void onClick(View v) {
                     Category cat = new Category(etCategory.getText().toString()); // יוצר קטגוריה
-                    fireStoreHelper.add(cat); // מוסיף למסד נתונים
+                    if (cat.toString().equals(""))
+                        dialog.dismiss();
+                    fireStoreHelper.add(cat, EditProductActivity.this); // מוסיף למסד נתונים
                     setCategories(); // מרענן קטגוריות בספינר
                     dialog.dismiss(); // סוגר דיאלוג
                 }

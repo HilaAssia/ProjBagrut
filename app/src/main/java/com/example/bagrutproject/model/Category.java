@@ -5,4 +5,8 @@ public class Category {
     public Category(String cat){
         this.category=cat;
     }
+
+    public String getCategory() {
+        return category;
+    }
 }

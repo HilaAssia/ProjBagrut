@@ -12,13 +12,15 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.bagrutproject.R;
 import com.example.bagrutproject.databinding.ActivityManagerBinding;
+import com.example.bagrutproject.model.LogoutListener;
 import com.example.bagrutproject.utils.FBAuthHelper;
 import com.google.firebase.auth.FirebaseUser;
 
-public class ManagerActivity extends AppCompatActivity implements FBAuthHelper.FBReply {
+public class ManagerActivity extends AppCompatActivity implements FBAuthHelper.FBReply, LogoutListener {
 
     private FBAuthHelper fbAuthHelper;
     ActivityManagerBinding binding;
+
     @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +44,6 @@ public class ManagerActivity extends AppCompatActivity implements FBAuthHelper.F
                     break;
                 case R.id.InventoryItem:
                     replaceFragment(new InventoryFragment());
-                    break;
-                case R.id.LogoutItem:
-                    fbAuthHelper.logoutUser();
-                    Intent intent = new Intent(ManagerActivity.this, LogInActivity.class);
-                    startActivity(intent);
                     break;
             }
         });
@@ -75,4 +72,13 @@ public class ManagerActivity extends AppCompatActivity implements FBAuthHelper.F
         Toast.makeText(this, "success",
                 Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    public void logout(){
+        fbAuthHelper.logoutUser();
+        Intent intent = new Intent(ManagerActivity.this, LogInActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
 }

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+
 import com.example.bagrutproject.model.Category;
 import com.example.bagrutproject.model.Manager;
 import com.example.bagrutproject.model.Order;
@@ -11,6 +13,7 @@ import com.example.bagrutproject.model.Product;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -56,7 +59,14 @@ public class FireStoreHelper {
     public void add(Order order, Context context) {
         collectionRefOrder.add(order).addOnSuccessListener(documentReference -> {
             Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-            Toast.makeText(context, "your order was sent", Toast.LENGTH_SHORT).show();
+            new AlertDialog.Builder(context)
+                    .setTitle("your order was sent successfully")
+                    .setMessage("You will get an email when your order is ready :)")
+                    .setPositiveButton("ok", (dialog, which) -> {
+                        dialog.dismiss(); // פשוט סוגר את הדיאלוג
+                    })
+                    .show();
+            //Toast.makeText(context, "your order was sent", Toast.LENGTH_SHORT).show();
         }).addOnFailureListener(e -> {
             Log.w(TAG, "Error adding document", e);
         });
@@ -70,12 +80,28 @@ public class FireStoreHelper {
         });
     }
 
-    public void add(Category category) {
-        collectionRefCat.add(category).addOnSuccessListener(documentReference -> {
-            Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-        }).addOnFailureListener(e -> {
-            Log.w(TAG, "Error adding document", e);
-        });
+    public void add(Category category, Context context) {
+        collectionRefCat
+                .whereEqualTo("category", category.getCategory()) // נניח שיש getter כזה
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        // אם לא קיימת – נוסיף
+                        collectionRefCat.add(category)
+                                .addOnSuccessListener(documentReference -> {
+                                    Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.w(TAG, "Error adding document", e);
+                                });
+                    } else {
+                        Log.d(TAG, "Category already exists: " + category.getCategory());
+                        Toast.makeText(context, "Category already exists: " + category.getCategory(), Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.w(TAG, "Error checking for existing category", e);
+                });
     }
 
     public void add(Product product) {
@@ -112,6 +138,32 @@ public class FireStoreHelper {
         }).addOnFailureListener(e -> {
             Log.w(TAG, "Error deleting document", e);
         });
+    }
+    public void deleteCategory(String category, Context context) {
+        collectionRefCat
+                .whereEqualTo("category", category)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            String docId = documentSnapshot.getId();
+                            collectionRefCat.document(docId)
+                                    .delete()
+                                    .addOnSuccessListener(aVoid -> {
+                                        Log.d(TAG, "Category deleted successfully: " + docId);
+                                        Toast.makeText(context, "Category deleted successfully!", Toast.LENGTH_SHORT).show();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.w(TAG, "Error deleting category", e);
+                                    });
+                        }
+                    } else {
+                        Log.d(TAG, "No category found with name: " + category);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.w(TAG, "Error fetching category", e);
+                });
     }
     public void getAll() {
         collectionRefProduct.get().addOnCompleteListener(task -> {
@@ -163,4 +215,5 @@ public class FireStoreHelper {
     public static void setCurrentUser(FirebaseUser currentUser) {
         FireStoreHelper.currentUser = currentUser;
     }
+
 }

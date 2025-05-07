@@ -25,12 +25,21 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
     boolean isUser;
     Product product;
     FireStoreHelper fireStoreHelper;
+    private OnProductDeleteRequestListener deleteListener;
 
     public ProductsAdapter(FirestoreRecyclerOptions<Product> options, Context context, boolean isUser, FireStoreHelper fireStoreHelper) {
         super(options);
         this.context=context;
         this.isUser=isUser;
         this.fireStoreHelper=fireStoreHelper;
+    }
+
+    public interface OnProductDeleteRequestListener {
+        void onDeleteRequest(String id);
+    }
+
+    public void setOnProductDeleteRequestListener(ProductsAdapter.OnProductDeleteRequestListener listener) {
+        this.deleteListener = listener;
     }
 
     @Override
@@ -52,7 +61,9 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
                 decreaseQuantity(product);
             });
             holder.ibDelete.setOnClickListener(v ->  {
-                deleteProduct(product);
+                if (deleteListener!=null)
+                    deleteListener.onDeleteRequest(product.getId());
+                //deleteProduct(product);
             });
             holder.itemView.setOnClickListener(v-> {
                 Intent intent = new Intent(context, EditProductActivity.class);
@@ -76,6 +87,11 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
             holder.ibIncrease.setVisibility(View.GONE);
             holder.ibDecrease.setVisibility(View.GONE);
             holder.ibDelete.setVisibility(View.GONE);
+
+            if (context instanceof OrderDetailsActivity) {
+                holder.tvQuantity.setVisibility(View.VISIBLE);
+                holder.tvQuantity.setText(String.valueOf(product.getQuantity()));
+            }
 
             holder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(context, ProductDetailsActivity.class);
@@ -132,12 +148,14 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
             product.quantityAdd(-1);
             fireStoreHelper.update(product.getId(), product);
         } else {
-            deleteProduct(product);
+            if (deleteListener!=null)
+                deleteListener.onDeleteRequest(product.getId());
+            //deleteProduct(product.getId());
         }
     }
 
-    private void deleteProduct(Product product) {
-        fireStoreHelper.deleteProduct(product.getId());
+    public void deleteProduct(String productId) {
+        fireStoreHelper.deleteProduct(productId);
     }
 
 }

@@ -13,6 +13,7 @@ import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -102,9 +103,18 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fbAuthHelper.logoutUser();
-                Intent intent = new Intent(UserActivity.this, LogInActivity.class);
-                startActivity(intent);
+                new AlertDialog.Builder(UserActivity.this)
+                        .setTitle("logout")
+                        .setMessage("are you sure you want to logout?")
+                        .setPositiveButton("yes", (dialog, which) -> {
+                            fbAuthHelper.logoutUser();
+                            Intent intent = new Intent(UserActivity.this, LogInActivity.class);
+                            startActivity(intent);
+                        })
+                        .setNegativeButton("cancel", (dialog, which) -> {
+                            dialog.dismiss(); // פשוט סוגר את הדיאלוג
+                        })
+                        .show();
             }
         });
         rvProducts= findViewById(R.id.urvProducts);

@@ -1,18 +1,25 @@
 package com.example.bagrutproject.views;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bagrutproject.R;
+import com.example.bagrutproject.model.LogoutListener;
 import com.example.bagrutproject.model.Product;
 import com.example.bagrutproject.utils.FireStoreHelper;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -39,6 +46,8 @@ public class ForSaleFragment extends Fragment implements FireStoreHelper.FBReply
     ProductsAdapter productsAdapter;
     RecyclerView rvSell;
     FireStoreHelper fireStoreHelper;
+    Spinner spinner;
+    Dialog dialog;
 
     public ForSaleFragment() {
         // Required empty public constructor
@@ -78,6 +87,37 @@ public class ForSaleFragment extends Fragment implements FireStoreHelper.FBReply
         View view = inflater.inflate(R.layout.fragment_for_sale, container, false);
         fireStoreHelper=new FireStoreHelper(this);
         rvSell= (RecyclerView) view.findViewById(R.id.rvSell);
+        dialog=new Dialog(ForSaleFragment.this.getContext());
+        spinner = (Spinner) view.findViewById(R.id.topNav); // מוצא את הספינר מהעיצוב
+        setOptions();
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() { // מאזין לבחירת קטגוריה
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                String selectedItem = parentView.getItemAtPosition(position).toString(); // מקבל את הקטגוריה שנבחרה
+                Toast.makeText(ForSaleFragment.this.getContext(), "בחרת: " + selectedItem, Toast.LENGTH_SHORT).show(); // מציג הודעה
+                if (selectedItem.equals("logout")) {
+                    new AlertDialog.Builder(requireContext())
+                            .setTitle("logout")
+                            .setMessage("are you sure you want to logout?")
+                            .setPositiveButton("yes", (dialog, which) -> {
+                                if (getActivity() instanceof LogoutListener) {
+                                    ((LogoutListener) getActivity()).logout();
+                                }
+                            })
+                            .setNegativeButton("cancel", (dialog, which) -> {
+                                dialog.dismiss(); // פשוט סוגר את הדיאלוג
+                            })
+                            .show();
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // פעולה שלא מתבצעת כלום אם לא נבחר כלום
+            }
+        });
+
         // Inflate the layout for this fragment
         setupRecyclerView();
 
@@ -92,6 +132,10 @@ public class ForSaleFragment extends Fragment implements FireStoreHelper.FBReply
         rvSell.setLayoutManager(new LinearLayoutManager(ForSaleFragment.this.getContext()));
         productsAdapter = new ProductsAdapter(options,ForSaleFragment.this.getContext(),false,fireStoreHelper);
         rvSell.setAdapter(productsAdapter);
+
+        productsAdapter.setOnProductDeleteRequestListener(productId -> {
+            showDeleteDialog(productId);
+        });
     }
 
     @Override
@@ -132,5 +176,38 @@ public class ForSaleFragment extends Fragment implements FireStoreHelper.FBReply
         FragmentTransaction ft = getParentFragmentManager().beginTransaction();
         ft.detach(this).attach(this).commit();
         Toast.makeText(this.getContext(), "Product deleted", Toast.LENGTH_SHORT).show();
+    }
+
+    public void updateSpinner(ArrayList<String> items) { // עדכון הספינר עם רשימת קטגוריות
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_spinner_item, items);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter); // מחבר את הרשימה לספינר
+    }
+
+    public void setOptions() { // שליפת קטגוריות מ-Firestore
+        ArrayList<String> categoriesList = new ArrayList<>();
+        categoriesList.add(""); // קטגוריה ברירת מחדל
+
+        categoriesList.add("logout");
+
+        updateSpinner(categoriesList);
+    }
+
+    private void showDeleteDialog(String productId) {
+        dialog.setContentView(R.layout.delete_dialog);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCancelable(false);
+
+        Button btnDelete = dialog.findViewById(R.id.btnDELETE);
+        Button btnCancel = dialog.findViewById(R.id.btnCancel);
+
+        btnDelete.setOnClickListener(v -> {
+            productsAdapter.deleteProduct(productId);
+            dialog.dismiss();
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
     }
 }

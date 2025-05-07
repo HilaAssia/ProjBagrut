@@ -8,26 +8,31 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.bagrutproject.R;
+import com.example.bagrutproject.model.Product;
 import com.example.bagrutproject.utils.FBAuthHelper;
+import com.example.bagrutproject.utils.FireStoreHelper;
 import com.example.bagrutproject.utils.ImageUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ProductDetailsActivity extends AppCompatActivity {
+public class ProductDetailsActivity extends AppCompatActivity implements FireStoreHelper.FBReply {
 
     FBAuthHelper fbAuthHelper;
+    FireStoreHelper fireStoreHelper;
     SharedPreferences sp;
     ImageView ivImage;
     TextView tvName, tvPrice, tvDetails;
-    Button addToCartBtn;
+    Button addToCartBtn, continueShoppingBtn;
     String docId,id;
     boolean isUser=false;
 
@@ -38,28 +43,47 @@ public class ProductDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_product_details);
 
         fbAuthHelper=new FBAuthHelper(this,null);
+        fireStoreHelper=new FireStoreHelper(this);
         ivImage=findViewById(R.id.imageView);
         tvName=findViewById(R.id.tvName);
         tvPrice=findViewById(R.id.tvPrice);
         tvDetails=findViewById(R.id.tvDetails);
 
         docId = getIntent().getStringExtra("docId");
-        if (docId != null && !docId.isEmpty()){
-            ivImage.setImageBitmap(ImageUtils.convertStringToBitmap(getIntent().getStringExtra("image")));
-            tvName.setText(getIntent().getStringExtra("name"));
-            tvPrice.setText(getIntent().getStringExtra("price")+"₪");
-            tvDetails.setText(getIntent().getStringExtra("details"));
-            isUser=getIntent().getBooleanExtra("isUser",false);
-            id=getIntent().getStringExtra("id");
-            //etCategory.setText(getIntent().getStringExtra("category"));
+        if (docId == null || docId.isEmpty()){
+            Toast.makeText(this, "a problem appeared while uploading this product", Toast.LENGTH_SHORT).show();
+            Intent intent=new Intent(ProductDetailsActivity.this,UserActivity.class);
+            startActivity(intent);
+            finish();
         }
+            //isEditMode = true; // מפעיל מצב עריכה
+
+            //fireStoreHelper.getOne(docId);
+            /*forSale.setChecked(getIntent().getBooleanExtra("forSale", false));
+            etName.setText(getIntent().getStringExtra("name"));
+            etPrice.setText(getIntent().getStringExtra("price"));
+            etDetails.setText(getIntent().getStringExtra("details"));
+            etQuantity.setText(Integer.toString(getIntent().getIntExtra("quantity", 0)));
+            category = getIntent().getStringExtra("category");
+            findViewById(R.id.btndelete).setVisibility(View.VISIBLE); // מציג כפתור מחיקה*/
+        fireStoreHelper.getOne(docId);
 
         addToCartBtn=findViewById(R.id.btnAddToCart);
         addToCartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addProduct(id);
+                addProduct(docId);
                 Intent intent=new Intent(ProductDetailsActivity.this,CartActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        continueShoppingBtn=findViewById(R.id.btnContinueShopping);
+        continueShoppingBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(ProductDetailsActivity.this,UserActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -97,5 +121,35 @@ public class ProductDetailsActivity extends AppCompatActivity {
         String updatedJson = gson.toJson(cartMap);
         editor.putString("cartMap", updatedJson);
         editor.commit();
+    }
+
+    @Override
+    public void getAllSuccess(ArrayList<Product> products) {
+
+    }
+
+    @Override
+    public void getOneSuccess(Product product) {
+        // ממלא את השדות הקיימים במידע שהגיע
+        ivImage.setImageBitmap(ImageUtils.convertStringToBitmap(product.getImage()));
+        //forSale.setChecked(product.getForSale());
+        tvName.setText(product.getName());
+        tvPrice.setText(product.getPrice()+"₪");
+        tvDetails.setText(product.getDetails());
+        //etQuantity.setText(String.valueOf(product.getQuantity()));
+        //category = product.getCategory();
+        //setCategories(); // טוען קטגוריות לספינר
+
+        //findViewById(R.id.btndelete).setVisibility(View.VISIBLE); // מציג כפתור מחיקה
+    }
+
+    @Override
+    public void onProductsLoaded(ArrayList<Product> products) {
+
+    }
+
+    @Override
+    public void onDeleteSuccess() {
+
     }
 }
