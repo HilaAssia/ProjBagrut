@@ -27,7 +27,7 @@ public class FireStoreHelper {
     private static CollectionReference collectionRefManager = db.collection("managers");
     private static CollectionReference collectionRefOrder = db.collection("orders");
     private FireStoreHelper.FBReply fbReply;
-    private FireStoreHelper.FBProductStat fbProductStat;
+    private FireStoreHelper.FBAddStat fbAddStat;
 
     public interface FBReply {
         void getAllSuccess(ArrayList<Product> products);
@@ -36,24 +36,24 @@ public class FireStoreHelper {
         void onDeleteSuccess();
     }
 
-    public interface FBProductStat{
-        void onAddSuccesses(String id, Product product);
+    public interface FBAddStat{
+        void onAddProductSuccesses(String id, Product product);
+        void onAddOrderSuccesses(String id, Order order);
     }
 
-    public FireStoreHelper() {
-    }
+    public FireStoreHelper() {}
 
     public FireStoreHelper(FireStoreHelper.FBReply fbReply) {
         this.fbReply = fbReply;
     }
 
-    public FireStoreHelper(FireStoreHelper.FBProductStat fbProductStat) {
-        this.fbProductStat = fbProductStat;
+    public FireStoreHelper(FireStoreHelper.FBAddStat fbAddStat) {
+        this.fbAddStat = fbAddStat;
     }
 
-    public FireStoreHelper(FireStoreHelper.FBReply fbReply,FireStoreHelper.FBProductStat fbProductStat) {
+    public FireStoreHelper(FireStoreHelper.FBReply fbReply,FireStoreHelper.FBAddStat fbAddStat) {
         this.fbReply = fbReply;
-        this.fbProductStat = fbProductStat;
+        this.fbAddStat = fbAddStat;
     }
 
     public void add(Order order, Context context) {
@@ -63,12 +63,14 @@ public class FireStoreHelper {
                     .setTitle("your order was sent successfully")
                     .setMessage("You will get an email when your order is ready :)")
                     .setPositiveButton("ok", (dialog, which) -> {
+                        fbAddStat.onAddOrderSuccesses(documentReference.getId(),order);
                         dialog.dismiss(); // פשוט סוגר את הדיאלוג
                     })
                     .show();
             //Toast.makeText(context, "your order was sent", Toast.LENGTH_SHORT).show();
         }).addOnFailureListener(e -> {
             Log.w(TAG, "Error adding document", e);
+            Toast.makeText(context, "error uploading your order!!!", Toast.LENGTH_LONG).show();
         });
     }
 
@@ -107,7 +109,7 @@ public class FireStoreHelper {
     public void add(Product product) {
         collectionRefProduct.add(product).addOnSuccessListener(documentReference -> {
             Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-            fbProductStat.onAddSuccesses(documentReference.getId(), product);
+            fbAddStat.onAddProductSuccesses(documentReference.getId(), product);
         }).addOnFailureListener(e -> {
             Log.w(TAG, "Error adding document", e);
         });
@@ -128,6 +130,7 @@ public class FireStoreHelper {
     public void deleteProduct(String id) {
         collectionRefProduct.document(id).delete().addOnSuccessListener(aVoid -> {
             Log.d(TAG, "DocumentSnapshot deleted with ID: " + id);
+            fbReply.onDeleteSuccess();
         }).addOnFailureListener(e -> {
             Log.w(TAG, "Error deleting document", e);
         });

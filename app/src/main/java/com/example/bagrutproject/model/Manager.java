@@ -3,8 +3,8 @@ package com.example.bagrutproject.model;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class Manager {
-    String eMail;
-    String uID;
+    private String eMail;
+    private String uID;
 
     public Manager(){}
 

@@ -96,6 +96,7 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
             public void onClick(View v) {
                 Intent intent=new Intent(UserActivity.this, CartActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -110,6 +111,7 @@ public class UserActivity extends AppCompatActivity implements FBAuthHelper.FBRe
                             fbAuthHelper.logoutUser();
                             Intent intent = new Intent(UserActivity.this, LogInActivity.class);
                             startActivity(intent);
+                            finish();
                         })
                         .setNegativeButton("cancel", (dialog, which) -> {
                             dialog.dismiss(); // פשוט סוגר את הדיאלוג

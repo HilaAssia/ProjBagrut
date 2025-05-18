@@ -149,12 +149,12 @@ public class OrdersFragment extends Fragment {
         spinner.setAdapter(adapter); // מחבר את הרשימה לספינר
     }
 
-    public void setOptions() { // שליפת קטגוריות מ-Firestore
-        ArrayList<String> categoriesList = new ArrayList<>();
-        categoriesList.add(""); // קטגוריה ברירת מחדל
+    public void setOptions() {
+        ArrayList<String> list = new ArrayList<>();
+        list.add(""); // ברירת מחדל
 
-        categoriesList.add("logout");
+        list.add("logout");
 
-        updateSpinner(categoriesList);
+        updateSpinner(list);
     }
 }

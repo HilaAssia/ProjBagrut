@@ -25,9 +25,9 @@ public class FBAuthHelper {
     public static FirebaseUser getCurrentUser(){return mAuth.getCurrentUser();}
 
     public interface FBReply{
-        public void createUserSuccess (FirebaseUser user);
-        public void loginSuccess (FirebaseUser user);
-        public void logoutSuccess (FirebaseUser user);
+        void createUserSuccess (FirebaseUser user);
+        void loginSuccess (FirebaseUser user);
+        void logoutSuccess (FirebaseUser user);
     }
 
     public void createUser(String email, String password){

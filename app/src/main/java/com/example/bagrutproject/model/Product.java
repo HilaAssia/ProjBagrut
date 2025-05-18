@@ -5,14 +5,14 @@ import java.util.UUID;
 
 public class Product implements Serializable {
 
-    String image;
-    String name;
-    String price;
-    String category;
-    String details;
-    String id;
-    int quantity;
-    boolean forSale;
+    private String image;
+    private String name;
+    private String price;
+    private String category;
+    private String details;
+    private String id;
+    private int quantity;
+    private boolean forSale;
 
     public Product() {
         
@@ -105,16 +105,6 @@ public class Product implements Serializable {
 
     public void setCategory(String category) {
         this.category = category;
-    }
-
-    public String toString() {
-        return "image address: " + image + "\n" +
-                "name: " + name + "\n" +
-                "price: " + price + "\n" +
-                "details: " + details + "\n" +
-                "quantity: " + quantity + "\n" +
-                "category: " + category + "\n" +
-                "id: " + id;
     }
 
     public void setId(String id) {

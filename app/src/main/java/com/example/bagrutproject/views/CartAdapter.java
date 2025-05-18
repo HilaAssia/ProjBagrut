@@ -51,7 +51,7 @@ public class CartAdapter extends FirestoreRecyclerAdapter<Product, CartAdapter.C
 
     // פונקציה שמקשרת בין אובייקט מוצר לבין תצוגת האייטם בעגלה
     @Override
-    protected void onBindViewHolder(@NonNull CartAdapter.CartViewHolder holder, int position, @NonNull Product product) {
+    protected void onBindViewHolder(@NonNull CartViewHolder holder, int position, @NonNull Product product) {
         // אם למוצר יש תמונה, המרה ממחרוזת לביטמאפ והצגה בתמונה
         if (product.getImage() != null)
             holder.ivImage.setImageBitmap(ImageUtils.convertStringToBitmap(product.getImage()));
@@ -122,7 +122,7 @@ public class CartAdapter extends FirestoreRecyclerAdapter<Product, CartAdapter.C
     // יצירת מופע של ViewHolder לכל פריט ברשימה
     @NonNull
     @Override
-    public CartAdapter.CartViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CartViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // יצירה של פריט לפי עיצוב פריט עגלה מה-XML
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.cart_item, parent, false);
         return new CartAdapter.CartViewHolder(view); // החזרת ה-ViewHolder שנוצר
@@ -211,10 +211,7 @@ public class CartAdapter extends FirestoreRecyclerAdapter<Product, CartAdapter.C
             if (currentQuantity > 1) {
                 cartMap.put(productId, currentQuantity - 1);
             } else {
-                if (deleteListener != null) {
-                    deleteListener.onDeleteRequest(productId);
-                    return;
-                } // הסרה אם הכמות היא 1
+                deleteProduct(productId); // הסרה אם הכמות היא 1
             }
         }
 

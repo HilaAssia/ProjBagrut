@@ -23,7 +23,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderDetailsActivity extends AppCompatActivity implements FireStoreHelper.FBReply {
+public class OrderDetailsActivity extends AppCompatActivity {
 
     FireStoreHelper fireStoreHelper;
     TextView tvUid, tvEmail, tvOrderCost, tvTimestamp;
@@ -45,7 +45,7 @@ public class OrderDetailsActivity extends AppCompatActivity implements FireStore
         tvOrderCost=findViewById(R.id.tvOrderCost);
         tvTimestamp=findViewById(R.id.tvTimestamp);
         rvOrderProducts=findViewById(R.id.rvOrderProducts);
-        fireStoreHelper=new FireStoreHelper(this);
+        fireStoreHelper=new FireStoreHelper();
 
         docId = getIntent().getStringExtra("docId");
         if (docId != null && !docId.isEmpty()){
@@ -157,29 +157,5 @@ public class OrderDetailsActivity extends AppCompatActivity implements FireStore
 
         sb.append("\nTotal: ").append(total).append(" ₪");
         return sb.toString();
-    }
-
-    @Override
-    public void getAllSuccess(ArrayList<Product> products) {
-
-    }
-
-    @Override
-    public void getOneSuccess(Product product) {
-
-    }
-
-    @Override
-    public void onProductsLoaded(ArrayList<Product> products) {
-        for (Product p:products){
-            orderString+= p.toString()+"./n ";
-        }
-        Toast.makeText(this, products.size()+" products loaded", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onDeleteSuccess() {
-        recreate();
-        Toast.makeText(this, "Product deleted", Toast.LENGTH_SHORT).show();
     }
 }

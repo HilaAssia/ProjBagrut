@@ -2,6 +2,7 @@ package com.example.bagrutproject.model;
 
 public class Category {
     public String category;
+    public Category(){}
     public Category(String cat){
         this.category=cat;
     }

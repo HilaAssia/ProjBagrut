@@ -156,6 +156,7 @@ public class ProductsAdapter extends FirestoreRecyclerAdapter<Product, ProductsA
 
     public void deleteProduct(String productId) {
         fireStoreHelper.deleteProduct(productId);
+
     }
 
 }

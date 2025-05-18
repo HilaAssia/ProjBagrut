@@ -31,9 +31,9 @@ public class ProductDetailsActivity extends AppCompatActivity implements FireSto
     FireStoreHelper fireStoreHelper;
     SharedPreferences sp;
     ImageView ivImage;
-    TextView tvName, tvPrice, tvDetails;
+    TextView tvName, tvPrice, tvDetails, tvOutOfStock;
     Button addToCartBtn, continueShoppingBtn;
-    String docId,id;
+    String docId;
     boolean isUser=false;
 
     @SuppressLint("MissingInflatedId")
@@ -48,6 +48,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements FireSto
         tvName=findViewById(R.id.tvName);
         tvPrice=findViewById(R.id.tvPrice);
         tvDetails=findViewById(R.id.tvDetails);
+        tvOutOfStock=findViewById(R.id.outOfStock);
 
         docId = getIntent().getStringExtra("docId");
         if (docId == null || docId.isEmpty()){
@@ -136,11 +137,10 @@ public class ProductDetailsActivity extends AppCompatActivity implements FireSto
         tvName.setText(product.getName());
         tvPrice.setText(product.getPrice()+"₪");
         tvDetails.setText(product.getDetails());
-        //etQuantity.setText(String.valueOf(product.getQuantity()));
-        //category = product.getCategory();
-        //setCategories(); // טוען קטגוריות לספינר
-
-        //findViewById(R.id.btndelete).setVisibility(View.VISIBLE); // מציג כפתור מחיקה
+        if (product.getQuantity()<=0) {
+            tvOutOfStock.setVisibility(View.VISIBLE);
+            addToCartBtn.setVisibility(View.GONE);
+        }
     }
 
     @Override

@@ -57,7 +57,7 @@ public class LogInActivity extends AppCompatActivity implements FBAuthHelper.FBR
                                 // User is a regular user
                                 startActivity(new Intent(LogInActivity.this, UserActivity.class));
                                 finish();
-                                Log.d("Firestore", "לא נמצא מסמך עם ה-uID של המשתמש");
+                                Log.d("Firestore", "לא נמצא מסמך מנהל עם ה-uID של המשתמש");
                             }
                         } else {
                             Log.e("Firestore", "שגיאה בקריאת המסמכים: ", task.getException());

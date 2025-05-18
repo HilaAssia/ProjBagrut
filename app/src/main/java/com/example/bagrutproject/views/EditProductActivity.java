@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.bagrutproject.R;
 import com.example.bagrutproject.model.Category;
+import com.example.bagrutproject.model.Order;
 import com.example.bagrutproject.model.Product;
 import com.example.bagrutproject.utils.FireStoreHelper;
 import com.example.bagrutproject.utils.ImageUtils;
@@ -31,7 +32,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 
-public class EditProductActivity extends AppCompatActivity implements FireStoreHelper.FBProductStat, FireStoreHelper.FBReply {
+public class EditProductActivity extends AppCompatActivity implements FireStoreHelper.FBAddStat, FireStoreHelper.FBReply {
 
     private ActivityResultLauncher<Void> mGetThumb; // מפעיל מצלמה ולקיחת תמונה מוקטן
     private ActivityResultLauncher<String> mGetContent; // מפעיל בחירת תמונה מהגלריה
@@ -134,8 +135,6 @@ public class EditProductActivity extends AppCompatActivity implements FireStoreH
             @Override
             public void onClick(View v) {
                 deleteProduct(); // מוחק את המוצר
-                Intent intent = new Intent(EditProductActivity.this, ManagerActivity.class); // עובר חזרה למסך הניהול
-                startActivity(intent);
             }
         });
     }
@@ -270,9 +269,14 @@ public class EditProductActivity extends AppCompatActivity implements FireStoreH
     }
 
     @Override
-    public void onAddSuccesses(String docId, Product product) {
+    public void onAddProductSuccesses(String docId, Product product) {
         product.setId(docId);
         fireStoreHelper.update(docId, product);
+    }
+
+    @Override
+    public void onAddOrderSuccesses(String id, Order order) {
+
     }
 
     @Override
@@ -302,6 +306,8 @@ public class EditProductActivity extends AppCompatActivity implements FireStoreH
 
     @Override
     public void onDeleteSuccess() {
-
+        Intent intent = new Intent(EditProductActivity.this, ManagerActivity.class); // עובר חזרה למסך הניהול
+        startActivity(intent);
+        finish();
     }
 }

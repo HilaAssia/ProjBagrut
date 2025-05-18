@@ -16,14 +16,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.bagrutproject.R;
 import com.example.bagrutproject.model.AdminPasswordChecker;
 import com.example.bagrutproject.model.Manager;
-import com.example.bagrutproject.model.Product;
 import com.example.bagrutproject.utils.FBAuthHelper;
 import com.example.bagrutproject.utils.FireStoreHelper;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.ArrayList;
-
-public class SignUpActivity extends AppCompatActivity implements FBAuthHelper.FBReply, FireStoreHelper.FBReply {
+public class SignUpActivity extends AppCompatActivity implements FBAuthHelper.FBReply {
 
     // Firebase helpers
     private FBAuthHelper fbAuthHelper;
@@ -45,7 +42,7 @@ public class SignUpActivity extends AppCompatActivity implements FBAuthHelper.FB
 
         // Initialize Firebase helpers
         fbAuthHelper = new FBAuthHelper(this, this);
-        fireStoreHelper = new FireStoreHelper(this);
+        fireStoreHelper = new FireStoreHelper();
 
         // Link UI components
         eMail = findViewById(R.id.email);
@@ -170,18 +167,4 @@ public class SignUpActivity extends AppCompatActivity implements FBAuthHelper.FB
 
     @Override
     public void logoutSuccess(FirebaseUser user) {}
-
-    @Override
-    public void getAllSuccess(ArrayList<Product> products) {}
-
-    @Override
-    public void getOneSuccess(Product product) {}
-
-    @Override
-    public void onProductsLoaded(ArrayList<Product> products) {}
-
-    @Override
-    public void onDeleteSuccess() {
-
-    }
 }

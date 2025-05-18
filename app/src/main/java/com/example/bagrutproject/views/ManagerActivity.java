@@ -27,6 +27,7 @@ public class ManagerActivity extends AppCompatActivity implements FBAuthHelper.F
         super.onCreate(savedInstanceState);
         binding = ActivityManagerBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
         String fragmentToLoad = getIntent().getStringExtra("fragmentToLoad");
         if (fragmentToLoad != null && fragmentToLoad.equals("orders")) {
             replaceFragment(new OrdersFragment());

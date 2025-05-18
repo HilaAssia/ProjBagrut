@@ -51,7 +51,7 @@ public class OrdersAdapter extends FirestoreRecyclerAdapter<Order, OrdersAdapter
 
     @NonNull
     @Override
-    public OrdersAdapter.OrderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public OrderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.order_item, parent, false);
         return new OrdersAdapter.OrderViewHolder(view);
     }

@@ -3,14 +3,13 @@ package com.example.bagrutproject.model;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class Order {
-    ArrayList<Product> products;
-    String uid;
-    String email;
-    String totalPrice;
-    String timestamp;
+    private ArrayList<Product> products;
+    private String uid;
+    private String email;
+    private String totalPrice;
+    private String timestamp;
     public Order(){}
     public Order(ArrayList<Product> products, String uid, String totalPrice, String email){
         this.products=products;
@@ -67,15 +66,4 @@ public class Order {
         this.timestamp = timestamp;
     }
 
-    public static String productsToString(List<Product> products) {
-        StringBuilder result = new StringBuilder();
-
-        if (products != null) {
-            for (Product p : products) {
-                result.append(p.toString()).append("\n--------------------\n");
-            }
-        }
-
-        return result.toString();
-    }
 }
